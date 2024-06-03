@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="/static/styles.css" rel="stylesheet">
+</head>
+
+<body>
+    <h2>Exam Tutor</h2>
+    <p>{{ output|safe }}</p>
+    <form action="/query" method="post">
+        <div class="container">
+            <label for="uname"><b>Answer</b></label>
+            <input type="text" placeholder="Enter Answer" name="q" required>
+
+            <button type="submit">Submit</button>
+        </div>
+    </form>
+
+</body>
+
+</html>
