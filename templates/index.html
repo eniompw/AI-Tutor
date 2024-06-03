@@ -1,23 +1,39 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link href="/static/styles.css" rel="stylesheet">
 </head>
-
 <body>
-    <h2>Exam Tutor</h2>
-    <p>{{ output|safe }}</p>
-    <form action="/query" method="post">
+    <h2> <b> Exam Tutor </b> </h2>
+    <p>{{ question|safe }}</p>
+    <form action="/response" onsubmit="move()">
         <div class="container">
-            <label for="uname"><b>Answer</b></label>
-            <input type="text" placeholder="Enter Answer" name="q" required>
-
-            <button type="submit">Submit</button>
+        <label for="uname"><b>Answer</b></label>
+        <input type="text" placeholder="Enter Answer" name="ans" required>
+        <button type="submit">Submit</button>
         </div>
     </form>
-
+    <p>{{ answer|safe }}</p>
+    <div class="w3-container">
+    <div class="w3-light-grey">
+    <div id="myBar" class="w3-container w3-green w3-center">
+    <script>
+    function move() {
+        var elem = document.getElementById("myBar");
+        var width = 0;
+        var id = setInterval(frame, 110);
+        function frame() {
+            if (width >= 100) {
+                clearInterval(id);
+            } else {
+                width++;
+                elem.style.width = width + '%';
+                elem.innerHTML = width * 1 + '%';
+            }
+        }
+    }
+    </script>
 </body>
-
 </html>
