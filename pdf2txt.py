@@ -34,7 +34,9 @@ for pdf_file in pdf_files:
     # Initialize an empty string to store the extracted text
     text = ""
     # Loop through all pages except the first and last (indexing starts from 0)
-    for i in range(1, len(reader.pages) - 1):
+    start = 1
+    if file_name == "ms": start = 7
+    for i in range(start, len(reader.pages) - 1):
         # Check if the current page doesn't contain "BLANK PAGE" text
         if "BLANK PAGE" not in reader.pages[i].extract_text():
             # Extract text from the page and remove any trailing dots using strip_dots function
