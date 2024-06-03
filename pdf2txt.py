@@ -13,6 +13,13 @@ urllib.request.urlretrieve(msurl, "/tmp/ms.pdf")
 def strip_dots(text):
     # Replace sequences of 2 or more periods with a single period
     cleaned_text = re.sub(r'\.{2,}', '', text)
+
+    # Remove specific phrases that are not needed
+    cleaned_text = cleaned_text.replace("© OCR 2022 ", "")
+    cleaned_text = cleaned_text.replace("Turn over ", "")
+    
+    # Remove any empty lines that may be left
+    cleaned_text = "\n".join([line for line in cleaned_text.split("\n") if line.strip() != ""])
     return cleaned_text
 
 # Search for all files ending with ".pdf" in the current directory
