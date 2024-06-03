@@ -17,6 +17,7 @@ def question():
     qp = f.read()
     f.close()
     qpinstructions = "output just the first question from this text and nothing else (use html to present the information nicely)"
+    # nextQ = session['question'] + "output the next question from the text and nothing else (use html to present the information nicely)"
     q = model.generate_content([qpinstructions, qp])
     session['question'] = q.text
     return q.text
