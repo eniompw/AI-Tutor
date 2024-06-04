@@ -12,6 +12,12 @@ app.secret_key = os.urandom(16)
 from groq import Groq
 client = Groq(api_key=os.environ.get("GROQ_API_KEY"),)
 
+@app.route('/previous')
+def previous():
+    if session['number'] > 0:
+        session['number'] -= 1
+    return redirect('/')
+
 @app.route('/next')
 def next():
     if session['number'] < session['total']:
