@@ -1,4 +1,5 @@
 # ai-tutor
 
-* [Extract text from pdf](https://github.com/eniompw/ai-tutor/blob/main/pdf2txt.py)
-* [Use text to ask questions](https://github.com/eniompw/ai-tutor/blob/main/app.py)
+* [PDF to TXT](https://github.com/eniompw/ai-tutor/blob/main/pdf2txt.py)
+* [TXT to DB](https://github.com/eniompw/ai-tutor/blob/main/txt2db.py)
+* [DB to UI](https://github.com/eniompw/ai-tutor/blob/main/app.py)
