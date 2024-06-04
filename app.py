@@ -1,4 +1,4 @@
-from flask import Flask, render_template, session, request
+from flask import Flask, render_template, session, request, redirect
 import sqlite3
 import os
 
@@ -12,24 +12,33 @@ app.secret_key = os.urandom(16)
 from groq import Groq
 client = Groq(api_key=os.environ.get("GROQ_API_KEY"),)
 
+@app.route('/next')
+def next():
+    if session['number'] < session['total']:
+        session['number'] += 1
+    return redirect('/')
+
 @app.route('/')
 def home():
+    if 'number' not in session:
+        session['number'] = 0
     con = sqlite3.connect('database.db')
     cur = con.cursor()
-    cur.execute("SELECT question FROM Questions")
-    row = cur.fetchone()
+    cur.execute("SELECT question FROM Questions ORDER BY QID")
+    row = cur.fetchall()
     con.close()
-
-    query = "clean this up and replace it with well presented html (don't mention the formatting of your response): "
-    session['question'] = groqAI(query + n2br(row))
+    session['total'] = len(row)
+    query = "clean this up and replace it with well presented html "
+    query += "only show the question in your response dont add anything else: "
+    session['question'] = groqAI(query + n2br(row[session['number']][0]))
     return render_template('index.html', question=session['question'], answer="")
 
 @app.route('/response')
 def answer():
     con = sqlite3.connect('database.db')
     cur = con.cursor()
-    cur.execute("SELECT answer FROM Questions")
-    row = cur.fetchone()
+    cur.execute("SELECT answer FROM Questions ORDER BY QID")
+    row = cur.fetchall()
     con.close()
 
     query = "use this question: \n" 
@@ -37,7 +46,7 @@ def answer():
     query += "\n the students answer: \n"
     query += request.args.get('ans')
     query += "\n and the mark scheme: \n"
-    query += n2br(row)
+    query += n2br(row[session['number']][0])
     query += "\n now give feedback on the students answer."
 
     # response = model.generate_content(query)
