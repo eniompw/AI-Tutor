@@ -20,14 +20,8 @@ def home():
     row = cur.fetchone()
     con.close()
 
-    processed_row = []
-    for field in row:
-        if isinstance(field, str):
-            field = field.replace("\n", "<br>")
-        processed_row.append(field)
-    
     query = "clean this up and replace it with well presented html (don't mention the formatting of your response): "
-    session['question'] = groqAI(query + str(tuple(processed_row)))
+    session['question'] = groqAI(query + n2br(row))
     return render_template('index.html', question=session['question'], answer="")
 
 @app.route('/response')
@@ -38,18 +32,12 @@ def answer():
     row = cur.fetchone()
     con.close()
 
-    processed_row = []
-    for field in row:
-        if isinstance(field, str):
-            field = field.replace("\n", "<br>")
-        processed_row.append(field)
-
     query = "use this question: \n" 
     query += session['question']
     query += "\n the students answer: \n"
     query += request.args.get('ans')
     query += "\n and the mark scheme: \n"
-    query += str(tuple(processed_row))
+    query += n2br(row)
     query += "\n now give feedback on the students answer."
 
     # response = model.generate_content(query)
@@ -59,6 +47,14 @@ def answer():
     response = groqAI(query)
     response = groqAI("remove markdown and format this using html. (don't mention the formatting of your response): \n" + response)
     return render_template('index.html', question=session['question'], answer=response)
+
+def n2br(row):
+    processed_row = []
+    for field in row:
+        if isinstance(field, str):
+            field = field.replace("\n", "<br>")
+        processed_row.append(field)
+    return str(tuple(processed_row))
 
 def groqAI(q):
     chat_completion = client.chat.completions.create(
