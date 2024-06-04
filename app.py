@@ -26,7 +26,8 @@ def home():
             field = field.replace("\n", "<br>")
         processed_row.append(field)
     
-    session['question'] = str(tuple(processed_row))
+    query = "clean this up and replace it with well presented html (don't mention the formatting of your response): "
+    session['question'] = groqAI(query + str(tuple(processed_row)))
     return render_template('index.html', question=session['question'], answer="")
 
 @app.route('/response')
@@ -56,7 +57,7 @@ def answer():
     # return render_template('index.html', question=session['question'], answer=response.text)
 
     response = groqAI(query)
-    response = groqAI("remove markdown and format this using html. (dont mention the formatting of your response): \n" + response)
+    response = groqAI("remove markdown and format this using html. (don't mention the formatting of your response): \n" + response)
     return render_template('index.html', question=session['question'], answer=response)
 
 def groqAI(q):
