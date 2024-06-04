@@ -1,12 +1,16 @@
 from flask import Flask, render_template, session, request
-import google.generativeai as genai
 import sqlite3
 import os
 
 app = Flask(__name__)
 app.secret_key = os.urandom(16)
-genai.configure(api_key=os.getenv('GOOGLE_API_KEY'))
-model = genai.GenerativeModel('gemini-1.5-flash')
+
+# import google.generativeai as genai
+# genai.configure(api_key=os.getenv('GOOGLE_API_KEY'))
+# model = genai.GenerativeModel('gemini-1.5-flash')
+
+from groq import Groq
+client = Groq(api_key=os.environ.get("GROQ_API_KEY"),)
 
 @app.route('/')
 def home():
@@ -41,11 +45,28 @@ def answer():
 
     query = "use this question: \n" 
     query += session['question']
-    query += "the students answer: \n"
+    query += "\n the students answer: \n"
     query += request.args.get('ans')
-    query += "and the mark scheme: \n"
+    query += "\n and the mark scheme: \n"
     query += str(tuple(processed_row))
-    query += "now give feedback on the students answer."
-    response = model.generate_content(query)
-    response = model.generate_content("remove markdown and format this using html: \n" + response.text)
-    return render_template('index.html', question=session['question'], answer=response.text)
+    query += "\n now give feedback on the students answer."
+
+    # response = model.generate_content(query)
+    # response = model.generate_content("remove markdown and format this using html: \n" + response.text)
+    # return render_template('index.html', question=session['question'], answer=response.text)
+
+    response = groqAI(query)
+    response = groqAI("remove markdown and format this using html. (dont mention the formatting of your response): \n" + response)
+    return render_template('index.html', question=session['question'], answer=response)
+
+def groqAI(q):
+    chat_completion = client.chat.completions.create(
+    messages=[
+        {   
+            "role": "user",
+            "content": str(q),
+        }
+    ],
+    model="llama3-70b-8192",
+    )
+    return chat_completion.choices[0].message.content
