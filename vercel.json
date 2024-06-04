@@ -10,7 +10,7 @@
       "src": "app.py",
       "use": "@vercel/python"
     }
-  ]
+  ],
   "functions": {
     "/(.*)": {
       "maxDuration": 60 // All functions can run for a maximum of 60 seconds
