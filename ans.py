@@ -1,7 +1,7 @@
-import google.generativeai as genai
 import os
 import sqlite3
 
+import google.generativeai as genai
 genai.configure(api_key=os.getenv('GOOGLE_API_KEY'))
 model = genai.GenerativeModel('gemini-1.5-flash')
 
@@ -10,7 +10,6 @@ def readfile(file):
     text = f.read()
     f.close()
     return text
-
 
 con = sqlite3.connect('database.db')
 cur = con.cursor()
