@@ -47,7 +47,7 @@ def answer():
     row = cur.fetchall()
     con.close()
 
-    query = "use this question: \n" 
+    query = "use this question (marks are in square brackets []): \n" 
     query += session['question']
     query += "\n the students answer: \n"
     query += request.args.get('ans')
