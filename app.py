@@ -30,7 +30,7 @@ def home():
         session['number'] = 0
     con = sqlite3.connect('database.db')
     cur = con.cursor()
-    cur.execute("SELECT question FROM Questions ORDER BY QID")
+    cur.execute("SELECT question FROM Questions ORDER BY QID DESC")
     row = cur.fetchall()
     con.close()
     session['total'] = len(row)
@@ -43,7 +43,7 @@ def home():
 def answer():
     con = sqlite3.connect('database.db')
     cur = con.cursor()
-    cur.execute("SELECT answer FROM Questions ORDER BY QID")
+    cur.execute("SELECT answer FROM Questions ORDER BY QID DESC")
     row = cur.fetchall()
     con.close()
 
