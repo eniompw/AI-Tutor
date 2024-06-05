@@ -20,7 +20,7 @@ def groqAI(q):
             "content": str(q),
         }
     ],
-    model="llama3-70b-8192",
+    model="llama3-8b-8192",
     )
     return chat_completion.choices[0].message.content
 
