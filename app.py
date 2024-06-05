@@ -96,21 +96,21 @@ def api():
         f.close()
         return api
     else:
-        return "gemini as default"
+        return "default: gemini"
 
 @app.route('/gemini')
 def gemini():
     f = open("/tmp/api.txt", "w")
     f.write("gemini")
     f.close()
-    return 'gemini'
+    return 'gemini set'
 
 @app.route('/llama')
 def llama():
     f = open("/tmp/api.txt", "w")
     f.write("llama")
     f.close()
-    return 'llama'
+    return 'llama set'
 
 @app.route('/previous')
 def previous():
