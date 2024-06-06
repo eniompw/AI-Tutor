@@ -28,14 +28,20 @@ def groqAI(q):
 def home():
     if 'number' not in session:
         session['number'] = 0
-    con = sqlite3.connect('database.db')
+    if 'subject' not in session:
+        session['subject'] = 'computing'
+    
+    con = sqlite3.connect(session['subject']+".db")
     cur = con.cursor()
-    cur.execute("SELECT question FROM Questions ORDER BY QID DESC")
+    cur.execute("SELECT question FROM Questions ORDER BY QID")
     row = cur.fetchall()
     con.close()
-    session['total'] = len(row)
-    query = "clean this up and replace it with well presented html "
-    query += "only show the question in your response dont add anything else: "
+    if 'total' not in session:
+        session['total'] = len(row)
+    question = row[session['number']][0]
+
+    query = "use html and not markdown to present / format this question correctly"
+    query += "(dont talk about the html in your answer or add any other content): \n"
     file_path = "/tmp/api.txt"
     if os.path.exists(file_path):
         f = open(file_path, "r")
@@ -45,18 +51,18 @@ def home():
     else:
         session['api'] = "gemini"
     if session['api'] == "gemini":
-        session['question'] = model.generate_content(query + n2br(row[session['number']][0])).text
+        session['question'] = model.generate_content(query + question).text
     elif session['api'] == "llama":
-        session['question'] = groqAI(query + n2br(row[session['number']][0]))
+        session['question'] = groqAI(query + question)
     else:
-        return "select api"
+        return "select api" 
     return render_template('index.html', question=session['question'], answer="")
 
 @app.route('/response')
 def answer():
-    con = sqlite3.connect('database.db')
+    con = sqlite3.connect(session['subject']+".db")
     cur = con.cursor()
-    cur.execute("SELECT answer FROM Questions ORDER BY QID DESC")
+    cur.execute("SELECT answer FROM Questions ORDER BY QID")
     row = cur.fetchall()
     con.close()
 
@@ -66,7 +72,7 @@ def answer():
     query += request.args.get('ans')
     query += "\n and the mark scheme: \n"
     query += n2br(row[session['number']][0])
-    query += "\n now give feedback on the students answer."
+    query += "\n now mark the student answer and give feedback on it"
 
     if session['api'] == "gemini":
         response = model.generate_content(query)
@@ -86,6 +92,20 @@ def n2br(row):
             field = field.replace("\n", "<br>")
         processed_row.append(field)
     return str(tuple(processed_row))
+
+@app.route('/subject')
+def subject():
+    return session['subject']
+
+@app.route('/bio')
+def bio():
+    session['subject'] = 'biology'
+    return session['subject']
+
+@app.route('/cs')
+def cs():
+    session['subject'] = 'computing'
+    return session['subject']
 
 @app.route('/api')
 def api():
@@ -120,6 +140,6 @@ def previous():
 
 @app.route('/next')
 def next():
-    if session['number'] < session['total']:
+    if session['number'] < session['total'] - 1:
         session['number'] += 1
     return redirect('/')
