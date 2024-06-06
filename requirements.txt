@@ -1,4 +1,4 @@
 Flask
-pypdf
+# pypdf
 google-generativeai
 groq
