@@ -18,7 +18,7 @@
 <body>
     <h2> <b> Exam Tutor </b> </h2>
     <p>{{ question|safe }}</p>
-    <form action="/response" onsubmit="move()">
+    <form id="form" action="/response" onsubmit="move()">
         <div class="container">
         <label for="uname"><b>Answer</b></label>
         <textarea placeholder="Enter Answer" name="ans" rows="4" required></textarea>
@@ -37,6 +37,15 @@
     </form>
     <p>{{ answer|safe }}</p>
     <script>
+    document.addEventListener('keydown', function(event) {
+    if (event.ctrlKey && event.key === 'Enter') {
+        const form = document.getElementById('form');
+        if (form) {
+        form.submit();
+        move();
+        }
+    }
+    });
     function move() {
         var elem = document.getElementById("myBar");
         var width = 0;
