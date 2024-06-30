@@ -78,12 +78,12 @@ def subject():
 @app.route('/bio')
 def bio():
     session['subject'] = 'biology'
-    return session['subject']
+    return redirect('/')
 
 @app.route('/cs')
 def cs():
     session['subject'] = 'computing'
-    return session['subject']
+    return redirect('/')
 
 @app.route('/number')
 def number():
