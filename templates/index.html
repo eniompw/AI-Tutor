@@ -4,35 +4,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link href="static/styles.css" rel="stylesheet">
-    <style>
-        textarea {
-            width: 100%;
-            padding: 12px 20px;
-            margin: 8px 0;
-            display: inline-block;
-            border: 1px solid #ccc;
-            box-sizing: border-box;
-            }
-    </style>
 </head>
 <body>
     <h2> <b> Exam Tutor </b> </h2>
     <div id="question"> {{ question|safe }} </div>
-    <div class="container">
-    <label for="uname"><b>Answer</b></label>
-    <textarea placeholder="Enter Answer" id="answer" rows="4" required></textarea>
-    <button id="submit">Submit</button> 
+    <div class="w3-container">
+        <label for="answer"><b>Answer</b></label>
+        <textarea placeholder="Enter Answer" id="answer" rows="4" required></textarea>
+        <button id="submit">Submit</button> 
     </div>
     <div class="w3-container">
         <div class="w3-light-grey"></div>
         <div id="myBar" class="w3-container w3-green w3-center"></div>
+        <p></p>
+        <form action="/previous">
+            <button type="submit">Previous</button>
+        </form>
+        <form action="/next">
+            <button type="submit">Next</button>
+        </form>
     </div>
-    <form action="/previous">
-        <button type="submit">Previous</button>
-    </form>
-    <form action="/next">
-        <button type="submit">Next</button>
-    </form>
     <h5>Summary: </h5>
     <div id="llama"></div>
     <h5>Detail: </h5>
