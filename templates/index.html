@@ -1,74 +1,83 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Tutor</title>
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-    <link href="static/styles.css" rel="stylesheet">
+    <link rel="stylesheet" href="static/styles.css">
 </head>
 <body>
-    <h2> <b> Exam Tutor </b> </h2>
-    <div class="w3-container">
-        <div id="question"> {{ question|safe }} </div>
+    <h1>Exam Tutor</h1>
+    <main class="w3-container">
+        <div id="question">{{ question|safe }}</div>
+        
         <label for="answer"><b>Answer</b></label>
-        <textarea placeholder="Enter Answer" id="answer" rows="4" required></textarea>
-        <button id="submit">Submit</button> 
-        <div class="w3-light-grey"></div>
-        <div id="myBar" class="w3-container w3-green w3-center"></div>
-        <p></p>
-        <form action="/previous">
-            <button type="submit">Previous</button>
-        </form>
-        <form action="/next">
-            <button type="submit">Next</button>
-        </form>
-    </div>
-    <h5>Summary: </h5>
-    <div id="llama"></div>
-    <h5>Detail: </h5>
-    <div id="gemini"></div>
-<script>        
-    document.addEventListener('DOMContentLoaded', function() {
-        const loadDataButton = document.getElementById('submit');
-        const llamaDiv = document.getElementById('llama');
-        const geminiDiv = document.getElementById('gemini');
-        const answerTextarea = document.getElementById('answer');
-    
-        loadDataButton.addEventListener('click', function() {
-            var elem = document.getElementById("myBar");
-            var width = 0;
-            var id = setInterval(function() {
-                if (width >= 100) {
-                    clearInterval(id);
-                } else {
-                    width++;
-                    elem.style.width = width + '%';
-                    elem.innerHTML = width * 1 + '%';
-                }
-            }, 30);
-    
-            const answer = encodeURIComponent(answerTextarea.value);
-    
-            fetch(`/llama?answer=${answer}`)
-                .then(response => response.text())
-                .then(data => {
-                    llamaDiv.textContent = data;
-                    return fetch(`/gemini?answer=${answer}`);
-                })
-                .then(response => response.text())
-                .then(data => {
-                    geminiDiv.innerHTML = data;
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-        });
-    
-        document.addEventListener('keydown', function(event) {
-            if (event.ctrlKey && event.key === 'Enter') {
-                loadDataButton.click();
+        <textarea id="answer" placeholder="Enter Answer" rows="4" required></textarea>
+        
+        <button id="submit">Submit</button>
+
+        <div id="progressBar" class="w3-light-grey">
+            <div id="progressBarFill" class="w3-container w3-green w3-center"></div>
+        </div>
+
+        <div class="navigation-buttons">
+            <form action="/previous"><button type="submit">Previous</button></form>
+            <form action="/next"><button type="submit">Next</button></form>
+        </div>
+    </main>
+
+    <section id="feedback">
+        <h2>Summary:</h2>
+        <div id="llama"></div>
+        <h2>Detail:</h2>
+        <div id="gemini"></div>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const submitButton = document.getElementById('submit');
+            const answerTextarea = document.getElementById('answer');
+            const llamaDiv = document.getElementById('llama');
+            const geminiDiv = document.getElementById('gemini');
+            const progressBarFill = document.getElementById('progressBarFill');
+
+            function updateProgressBar() {
+                let width = 0;
+                const interval = setInterval(() => {
+                    if (width >= 100) {
+                        clearInterval(interval);
+                    } else {
+                        width++;
+                        progressBarFill.style.width = `${width}%`;
+                        progressBarFill.textContent = `${width}%`;
+                    }
+                }, 30);
             }
+
+            async function fetchFeedback(answer) {
+                try {
+                    const llamaResponse = await fetch(`/llama?answer=${encodeURIComponent(answer)}`);
+                    llamaDiv.textContent = await llamaResponse.text();
+
+                    const geminiResponse = await fetch(`/gemini?answer=${encodeURIComponent(answer)}`);
+                    geminiDiv.innerHTML = await geminiResponse.text();
+                } catch (error) {
+                    console.error('Error fetching feedback:', error);
+                }
+            }
+
+            submitButton.addEventListener('click', () => {
+                updateProgressBar();
+                fetchFeedback(answerTextarea.value);
+            });
+
+            document.addEventListener('keydown', (event) => {
+                if (event.ctrlKey && event.key === 'Enter') {
+                    submitButton.click();
+                }
+            });
         });
-    });
-</script>
+    </script>
 </body>
 </html>

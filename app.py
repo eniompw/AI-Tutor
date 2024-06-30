@@ -1,88 +1,88 @@
 from flask import Flask, render_template, session, request, redirect
 import sqlite3
 import os
+import google.generativeai as genai
+from groq import Groq
 
 app = Flask(__name__)
 app.secret_key = os.urandom(16)
 
-import google.generativeai as genai
+# Configure AI models
 genai.configure(api_key=os.getenv('GOOGLE_API_KEY'))
-model = genai.GenerativeModel('gemini-1.5-flash')
+gemini_model = genai.GenerativeModel('gemini-1.5-flash')
+groq_client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
-from groq import Groq
-client = Groq(api_key=os.environ.get("GROQ_API_KEY"),)
+def get_db_connection(subject):
+    conn = sqlite3.connect(f"{subject}.db")
+    conn.row_factory = sqlite3.Row
+    return conn
 
-def groqAI(q):
-    chat_completion = client.chat.completions.create(
-    messages=[
-        {   
-            "role": "user",
-            "content": str(q),
-        }
-    ],
-    model="llama3-8b-8192",
+def groq_ai(query):
+    chat_completion = groq_client.chat.completions.create(
+        messages=[{"role": "user", "content": query}],
+        model="llama3-8b-8192",
     )
     return chat_completion.choices[0].message.content
 
+def get_question_and_answer(subject, question_number):
+    with get_db_connection(subject) as conn:
+        cur = conn.cursor()
+        cur.execute("SELECT question, answer FROM Questions ORDER BY QID")
+        rows = cur.fetchall()
+    
+    total_questions = len(rows)
+    question = rows[question_number]['question']
+    answer = rows[question_number]['answer'].replace("\n", "<br>")
+    
+    return question, answer, total_questions
+
 @app.route('/')
 def home():
-    if 'number' not in session:
-        session['number'] = 0
-    if 'subject' not in session:
-        session['subject'] = 'computing'
+    session.setdefault('number', 0)
+    session.setdefault('subject', 'computing')
     
-    con = sqlite3.connect(session['subject']+".db")
-    cur = con.cursor()
-    cur.execute("SELECT question FROM Questions ORDER BY QID")
-    row = cur.fetchall()
-    con.close()
-    if 'total' not in session:
-        session['total'] = len(row)
-    session['question'] = row[session['number']][0]
+    question, _, total_questions = get_question_and_answer(session['subject'], session['number'])
+    session['total'] = total_questions
+    session['question'] = question
 
-    query = "use html and not markdown to present / format this question correctly"
-    query += "(dont talk about the html in your answer or add any other content): \n"
     return render_template('index.html', question=session['question'])
 
 @app.route('/llama')
 def llama():
-    con = sqlite3.connect(session['subject']+".db")
-    cur = con.cursor()
-    cur.execute("SELECT answer FROM Questions ORDER BY QID")
-    row = cur.fetchall()
-    con.close()
-    session['ms'] = n2br(row[session['number']][0])
+    _, mark_scheme, _ = get_question_and_answer(session['subject'], session['number'])
+    session['ms'] = mark_scheme
 
-    query = "use this question: \n" 
-    query += session['question']
-    query += "\n the students answer: \n"
-    query += request.args.get('answer')
-    query += "\n and the mark scheme: \n"
-    query += session['ms']
-    query += "\n now give the student short and concise feedback on thier answer."
-    query += "\n (don't narrate your response)"
-    response = groqAI(query)
-    return response
-
-def n2br(row):
-    processed_row = []
-    for field in row:
-        if isinstance(field, str):
-            field = field.replace("\n", "<br>")
-        processed_row.append(field)
-    return str(tuple(processed_row))
+    query = f"""
+    Use this question:
+    {session['question']}
+    
+    The student's answer:
+    {request.args.get('answer')}
+    
+    And the mark scheme:
+    {session['ms']}
+    
+    Now give the student short and concise feedback on their answer.
+    (Don't narrate your response)
+    """
+    return groq_ai(query)
 
 @app.route('/gemini')
 def gemini():
-    query = "use this question (marks are in square brackets []): \n" 
-    query += session['question']
-    query += "\n the students answer: \n"
-    query += request.args.get('answer')
-    query += "\n and the mark scheme: \n"
-    query += session['ms']
-    query += "\n now mark the student answer and give clear and detailed feedback on it."
-    query += "\n (don't use markdown instead use minimal html to format your response)"
-    response = model.generate_content(query)
+    query = f"""
+    Use this question (marks are in square brackets []):
+    {session['question']}
+    
+    The student's answer:
+    {request.args.get('answer')}
+    
+    And the mark scheme:
+    {session['ms']}
+    
+    Now mark the student answer and give clear and detailed feedback on it.
+    (Don't use markdown; instead, use minimal HTML to format your response)
+    """
+    response = gemini_model.generate_content(query)
     return response.text
 
 @app.route('/subject')
@@ -105,12 +105,10 @@ def number():
 
 @app.route('/previous')
 def previous():
-    if session['number'] > 0:
-        session['number'] -= 1
+    session['number'] = max(0, session['number'] - 1)
     return redirect('/')
 
 @app.route('/next')
 def next():
-    if session['number'] < session['total'] - 1:
-        session['number'] += 1
+    session['number'] = min(session['total'] - 1, session['number'] + 1)
     return redirect('/')
