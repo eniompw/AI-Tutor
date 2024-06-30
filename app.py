@@ -12,11 +12,6 @@ genai.configure(api_key=os.getenv('GOOGLE_API_KEY'))
 gemini_model = genai.GenerativeModel('gemini-1.5-flash')
 groq_client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
-def get_db_connection(subject):
-    conn = sqlite3.connect(f"{subject}.db")
-    conn.row_factory = sqlite3.Row
-    return conn
-
 def groq_ai(query):
     chat_completion = groq_client.chat.completions.create(
         messages=[{"role": "user", "content": query}],
@@ -24,8 +19,9 @@ def groq_ai(query):
     )
     return chat_completion.choices[0].message.content
 
-def get_question_and_answer(subject, question_number):
-    with get_db_connection(subject) as conn:
+def get_question_data(subject, question_number):
+    with sqlite3.connect(f"{subject}.db") as conn:
+        conn.row_factory = sqlite3.Row
         cur = conn.cursor()
         cur.execute("SELECT question, answer FROM Questions ORDER BY QID")
         rows = cur.fetchall()
@@ -41,7 +37,7 @@ def home():
     session.setdefault('number', 0)
     session.setdefault('subject', 'computing')
     
-    question, _, total_questions = get_question_and_answer(session['subject'], session['number'])
+    question, _, total_questions = get_question_data(session['subject'], session['number'])
     session['total'] = total_questions
     session['question'] = question
 
@@ -49,7 +45,7 @@ def home():
 
 @app.route('/llama')
 def llama():
-    _, mark_scheme, _ = get_question_and_answer(session['subject'], session['number'])
+    _, mark_scheme, _ = get_question_data(session['subject'], session['number'])
     session['ms'] = mark_scheme
 
     query = f"""
