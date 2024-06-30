@@ -19,35 +19,25 @@ def groq_ai(query):
     )
     return chat_completion.choices[0].message.content
 
-def get_question_data(subject, question_number):
-    with sqlite3.connect(f"{subject}.db") as conn:
-        conn.row_factory = sqlite3.Row
-        cur = conn.cursor()
-        cur.execute("SELECT question, answer FROM Questions ORDER BY QID")
-        rows = cur.fetchall()
-    
-    total_questions = len(rows)
-    question = rows[question_number]['question']
-    answer = rows[question_number]['answer'].replace("\n", "<br>")
-    
-    return question, answer, total_questions
-
 @app.route('/')
 def home():
     session.setdefault('number', 0)
     session.setdefault('subject', 'computing')
     
-    question, _, total_questions = get_question_data(session['subject'], session['number'])
-    session['total'] = total_questions
-    session['question'] = question
+    with sqlite3.connect(f"{session['subject']}.db") as conn:
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+        cur.execute("SELECT question, answer FROM Questions ORDER BY QID")
+        rows = cur.fetchall()
+    
+    session['total'] = len(rows)
+    session['question'] = rows[session['number']]['question']
+    session['ms'] = rows[session['number']]['answer'].replace("\n", "<br>")
 
     return render_template('index.html', question=session['question'])
 
 @app.route('/llama')
 def llama():
-    _, mark_scheme, _ = get_question_data(session['subject'], session['number'])
-    session['ms'] = mark_scheme
-
     query = f"""
     Use this question:
     {session['question']}
