@@ -32,7 +32,7 @@ def home():
     
     session['total'] = len(rows)
     session['question'] = rows[session['number']]['question']
-    session['ms'] = rows[session['number']]['answer'].replace("\n", "<br>")
+    session['ms'] = rows[session['number']]['answer']
 
     return render_template('index.html', question=session['question'])
 
