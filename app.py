@@ -20,7 +20,7 @@ def groqAI(q):
             "content": str(q),
         }
     ],
-    model="llama3-70b-8192",
+    model="llama3-8b-8192",
     )
     return chat_completion.choices[0].message.content
 
@@ -49,7 +49,7 @@ def home():
         f.close()
         session['api'] = api
     else:
-        session['api'] = "gemini"
+        session['api'] = "llama"
     if session['api'] == "gemini":
         session['question'] = model.generate_content(query + question).text
     elif session['api'] == "llama":
