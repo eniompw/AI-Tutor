@@ -27,54 +27,48 @@
     <h5>Detail: </h5>
     <div id="gemini"></div>
 <script>        
-document.addEventListener('DOMContentLoaded', function() {
-    const loadDataButton = document.getElementById('submit');
-    const llamaDiv = document.getElementById('llama');
-    const geminiDiv = document.getElementById('gemini');
-    const answerTextarea = document.getElementById('answer');
-
-    function loadData() {
-        loading();
-        const answer = encodeURIComponent(answerTextarea.value);
-        // First, make the Llama request
-        fetch(`/llama?answer=${answer}`)
-            .then(response => response.text())
-            .then(data => {
-                llamaDiv.textContent = data;
-                // After Llama response is received, make the Gemini request
-                return fetch(`/gemini?answer=${answer}`);
-            })
-            .then(response => response.text())
-            .then(data => {
-                geminiDiv.innerHTML = data;
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-    }
-    function loading() {
-        var elem = document.getElementById("myBar");
-        var width = 0;
-        var id = setInterval(frame, 30);
-        function frame() {
-            if (width >= 100) {
-                clearInterval(id);
-            } else {
-                width++;
-                elem.style.width = width + '%';
-                elem.innerHTML = width * 1 + '%';
+    document.addEventListener('DOMContentLoaded', function() {
+        const loadDataButton = document.getElementById('submit');
+        const llamaDiv = document.getElementById('llama');
+        const geminiDiv = document.getElementById('gemini');
+        const answerTextarea = document.getElementById('answer');
+    
+        loadDataButton.addEventListener('click', function() {
+            var elem = document.getElementById("myBar");
+            var width = 0;
+            var id = setInterval(function() {
+                if (width >= 100) {
+                    clearInterval(id);
+                } else {
+                    width++;
+                    elem.style.width = width + '%';
+                    elem.innerHTML = width * 1 + '%';
+                }
+            }, 30);
+    
+            const answer = encodeURIComponent(answerTextarea.value);
+    
+            fetch(`/llama?answer=${answer}`)
+                .then(response => response.text())
+                .then(data => {
+                    llamaDiv.textContent = data;
+                    return fetch(`/gemini?answer=${answer}`);
+                })
+                .then(response => response.text())
+                .then(data => {
+                    geminiDiv.innerHTML = data;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+    
+        document.addEventListener('keydown', function(event) {
+            if (event.ctrlKey && event.key === 'Enter') {
+                loadDataButton.click();
             }
-        }
-    }
-    // Click event listener
-    loadDataButton.addEventListener('click', loadData);
-    // Keyboard shortcut event listener
-    document.addEventListener('keydown', function(event) {
-        if (event.ctrlKey && event.key === 'Enter') {
-            loadData();
-        }
+        });
     });
-});
 </script>
 </body>
 </html>
