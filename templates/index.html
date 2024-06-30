@@ -17,14 +17,12 @@
 </head>
 <body>
     <h2> <b> Exam Tutor </b> </h2>
-    <p>{{ question|safe }}</p>
-    <form id="form" action="/response" onsubmit="move()">
-        <div class="container">
-        <label for="uname"><b>Answer</b></label>
-        <textarea placeholder="Enter Answer" name="ans" rows="4" required></textarea>
-        <button type="submit">Submit</button> 
-        </div>
-    </form>
+    <div id="question"> {{ question|safe }} </div>
+    <div class="container">
+    <label for="uname"><b>Answer</b></label>
+    <textarea placeholder="Enter Answer" id="answer" rows="4" required></textarea>
+    <button id="submit">Submit</button> 
+    </div>
     <div class="w3-container">
         <div class="w3-light-grey"></div>
         <div id="myBar" class="w3-container w3-green w3-center"></div>
@@ -35,21 +33,40 @@
     <form action="/next">
         <button type="submit">Next</button>
     </form>
-    <p>{{ answer|safe }}</p>
-    <script>
-    document.addEventListener('keydown', function(event) {
-    if (event.ctrlKey && event.key === 'Enter') {
-        const form = document.getElementById('form');
-        if (form) {
-        form.submit();
-        move();
-        }
+    <h5>Summary: </h5>
+    <div id="llama"></div>
+    <h5>Detail: </h5>
+    <div id="gemini"></div>
+<script>        
+document.addEventListener('DOMContentLoaded', function() {
+    const loadDataButton = document.getElementById('submit');
+    const llamaDiv = document.getElementById('llama');
+    const geminiDiv = document.getElementById('gemini');
+    const answerTextarea = document.getElementById('answer');
+
+    function loadData() {
+        loading();
+        const answer = encodeURIComponent(answerTextarea.value);
+        // First, make the Llama request
+        fetch(`/llama?answer=${answer}`)
+            .then(response => response.text())
+            .then(data => {
+                llamaDiv.textContent = data;
+                // After Llama response is received, make the Gemini request
+                return fetch(`/gemini?answer=${answer}`);
+            })
+            .then(response => response.text())
+            .then(data => {
+                geminiDiv.innerHTML = data;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
     }
-    });
-    function move() {
+    function loading() {
         var elem = document.getElementById("myBar");
         var width = 0;
-        var id = setInterval(frame, 75);
+        var id = setInterval(frame, 30);
         function frame() {
             if (width >= 100) {
                 clearInterval(id);
@@ -60,6 +77,15 @@
             }
         }
     }
-    </script>
+    // Click event listener
+    loadDataButton.addEventListener('click', loadData);
+    // Keyboard shortcut event listener
+    document.addEventListener('keydown', function(event) {
+        if (event.ctrlKey && event.key === 'Enter') {
+            loadData();
+        }
+    });
+});
+</script>
 </body>
 </html>
