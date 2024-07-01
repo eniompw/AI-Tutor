@@ -36,14 +36,17 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            const answerInput = document.getElementById('answer');
             const submitButton = document.getElementById('submit');
-            const answerTextarea = document.getElementById('answer');
-            const llamaDiv = document.getElementById('llama');
-            const geminiDiv = document.getElementById('gemini');
+            const llamaOutput = document.getElementById('llama');
+            const geminiOutput = document.getElementById('gemini');
             const progressBarFill = document.getElementById('progressBarFill');
-
+        
             function updateProgressBar() {
                 let width = 0;
+                progressBarFill.style.width = '0%';
+                progressBarFill.textContent = '0%';
+        
                 const interval = setInterval(() => {
                     if (width >= 100) {
                         clearInterval(interval);
@@ -54,28 +57,24 @@
                     }
                 }, 30);
             }
-
-            async function fetchFeedback(answer) {
+        
+            async function fetchFeedback() {
+                const answer = encodeURIComponent(answerInput.value);
+        
+                updateProgressBar();
+        
                 try {
-                    const llamaResponse = await fetch(`/llama?answer=${encodeURIComponent(answer)}`);
-                    llamaDiv.textContent = await llamaResponse.text();
-
-                    const geminiResponse = await fetch(`/gemini?answer=${encodeURIComponent(answer)}`);
-                    geminiDiv.innerHTML = await geminiResponse.text();
+                    llamaOutput.textContent = await fetch(`/llama?answer=${answer}`).then(res => res.text());
+                    geminiOutput.innerHTML = await fetch(`/gemini?answer=${answer}`).then(res => res.text());
                 } catch (error) {
                     console.error('Error fetching feedback:', error);
                 }
             }
-
-            submitButton.addEventListener('click', () => {
-                updateProgressBar();
-                fetchFeedback(answerTextarea.value);
-            });
-
-            document.addEventListener('keydown', (event) => {
-                if (event.ctrlKey && event.key === 'Enter') {
-                    submitButton.click();
-                }
+        
+            submitButton.addEventListener('click', fetchFeedback);
+            
+            document.addEventListener('keydown', event => {
+                if (event.ctrlKey && event.key === 'Enter') fetchFeedback();
             });
         });
     </script>
