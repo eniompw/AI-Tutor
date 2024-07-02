@@ -33,9 +33,9 @@
     </main>
 
     <section id="feedback">
-        <h2>Summary:</h2>
+        <h2 id="summary-heading">Summary:</h2>
         <div id="groq"></div>
-        <h2>Detail:</h2>
+        <h2 id="detail-heading">Detail:</h2>
         <div id="gemini"></div>
     </section>
 
@@ -50,6 +50,11 @@
             const nextButton = document.getElementById('next');
             const biologyButton = document.getElementById('biology');
             const computingButton = document.getElementById('computing');
+            const summaryHeading = document.getElementById('summary-heading');
+            const detailHeading = document.getElementById('detail-heading');
+
+            // Set focus on the textarea when the page loads
+            answerInput.focus();
         
             function updateProgressBar() {
                 let width = 0;
@@ -77,10 +82,19 @@
                 updateProgressBar();
         
                 try {
+                    // Fetch and display Groq response
                     groqOutput.textContent = await fetch(`/ai_response/groq?answer=${answer}`).then(res => res.text());
+                    
+                    // Scroll to the summary section after receiving the Groq response
+                    summaryHeading.scrollIntoView({ behavior: 'smooth' });
+
+                    // Fetch and display Gemini response
                     geminiOutput.innerHTML = await fetch(`/ai_response/gemini?answer=${answer}`)
                         .then(res => res.text())
                         .then(text => markdownToHtmlBold(text));
+                    
+                    // Scroll to the detail section after receiving the Gemini response
+                    detailHeading.scrollIntoView({ behavior: 'smooth' });
                 } catch (error) {
                     console.error('Error fetching feedback:', error);
                 }
