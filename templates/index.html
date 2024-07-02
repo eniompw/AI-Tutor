@@ -13,7 +13,10 @@
         <div id="question">{{ question|safe }}</div>
         
         <label for="answer"><b>Answer</b></label>
-        <textarea id="answer" placeholder="Enter Answer" rows="4" required></textarea>
+        <div class="answer-container">
+            <textarea id="answer" placeholder="Enter Answer" rows="4" required></textarea>
+            <div class="tooltip">Ctrl + Enter to Submit</div>
+        </div>
         
         <button id="submit">Submit</button>
 
