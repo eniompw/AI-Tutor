@@ -1,101 +1,102 @@
-/* Base styles */
+:root {
+    --primary-color: #04AA6D;
+    --bg-color: #f0f0f0;
+    --text-color: #333;
+}
+
 body {
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: Arial, sans-serif;
     line-height: 1.6;
-    color: #333;
+    color: var(--text-color);
     max-width: 800px;
     margin: 0 auto;
-    padding: 20px;
-    padding-bottom: 100px;
-    background-color: #f0f0f0;
+    padding: 20px 20px 100px;
+    background-color: var(--bg-color);
 }
-h1 {
+
+h1, #currentSubject {
     text-align: center;
-    color: #04AA6D;
+    color: var(--primary-color);
 }
-/* Layout */
-.container {
-    padding: 16px;
+
+.container, #feedback {
     background-color: #f9f9f9;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 16px;
+    margin-bottom: 20px;
 }
-/* Form elements */
+
+button {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 16px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #038f5d;
+}
+
 .answer-container {
     position: relative;
     margin-bottom: 20px;
 }
+
 textarea {
     width: 100%;
-    padding: 12px 20px;
+    padding: 12px;
     margin: 8px 0;
-    display: block;
     border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box;
     font-size: 16px;
+    padding-bottom: 30px;
 }
-/* Tooltip for Ctrl+Enter shortcut */
+
 .tooltip {
     position: absolute;
-    bottom: 10px;
-    right: 10px;
+    bottom: 18px;
+    right: 8px;
     background-color: rgba(0, 0, 0, 0.05);
     color: #666;
-    text-align: right;
-    border-radius: 4px;
     padding: 4px 8px;
     font-size: 12px;
     font-style: italic;
-}
-/* Button styles */
-button {
-    background-color: #04AA6D;
-    color: white;
-    padding: 14px 20px;
-    margin: 8px 0;
-    border: none;
     border-radius: 4px;
-    cursor: pointer;
-    width: 100%;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
 }
-button:hover {
-    background-color: #038f5d;
+
+#progressBar {
+    margin: 15px 0 10px;
+    border-radius: 4px;
+    overflow: hidden;
 }
-/* Feedback section styles */
+
+#progressBarFill {
+    transition: width 0.5s linear;
+}
+
 #feedback {
-    margin-top: 10px; 
-    padding-top: 10px;
-    padding-bottom: 20px;
-    padding-left: 20px;
-    padding-right: 20px;
-    background-color: #f0f0f0;
-    border-radius: 8px;
+    margin-top: 10px;
+    padding: 20px;
+    background-color: var(--bg-color);
 }
+
 #feedback h2 {
-    color: #04AA6D;
-    border-bottom: 2px solid #04AA6D;
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--primary-color);
     padding-bottom: 5px;
     margin-top: 0;
     margin-bottom: 10px;
 }
-/* Progress bar styles */
-#progressBar {
-    margin-top: 15px;
-    margin-bottom: 10px;
-    border-radius: 4px;
-    overflow: hidden;
-}
-#progressBarFill {
-    transition: width 0.5s linear;
-}
-/* Additional style to reduce space between progress bar and feedback section */
-main.w3-container {
-    margin-bottom: 0; /* Remove any bottom margin from the main container */
-}
-/* Button overlay for navigation */
+
 .button-overlay {
     position: fixed;
     bottom: 20px;
@@ -105,44 +106,36 @@ main.w3-container {
     justify-content: center;
     gap: 20px;
     opacity: 0;
-    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+    transition: opacity 0.5s, transform 0.5s;
     transform: translateY(20px);
     z-index: 1000;
     background-color: rgba(255, 255, 255, 0.9);
     padding: 10px;
 }
+
 .button-overlay button {
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
     width: auto;
 }
-/* Try Again button initial state */
+
 #tryAgain {
     display: none;
     opacity: 0;
-    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-    transform: translateY(20px);
 }
-/* Utility classes */
+
 .show-buttons {
     opacity: 1 !important;
     transform: translateY(0) !important;
 }
+
 .loading {
     animation: pulse 1.5s infinite;
 }
-/* Animations */
+
 @keyframes pulse {
-    0% { opacity: 0.6; }
+    0%, 100% { opacity: 0.6; }
     50% { opacity: 1; }
-    100% { opacity: 0.6; }
 }
-/* Burger menu styles */
+
 .burger-menu {
     position: fixed;
     top: 20px;
@@ -150,22 +143,19 @@ main.w3-container {
     z-index: 1000;
     cursor: pointer;
 }
+
 .burger-icon {
     width: 30px;
     height: 3px;
-    background-color: #333;
+    background-color: var(--text-color);
     margin: 6px 0;
     transition: 0.4s;
 }
-.change .bar1 {
-    transform: rotate(-45deg) translate(-5px, 6px);
-}
-.change .bar2 {
-    opacity: 0;
-}
-.change .bar3 {
-    transform: rotate(45deg) translate(-5px, -6px);
-}
+
+.change .bar1 { transform: rotate(-45deg) translate(-5px, 6px); }
+.change .bar2 { opacity: 0; }
+.change .bar3 { transform: rotate(45deg) translate(-5px, -6px); }
+
 .menu-content {
     display: none;
     position: fixed;
@@ -173,40 +163,29 @@ main.w3-container {
     right: 20px;
     background-color: white;
     min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
     border-radius: 5px;
 }
+
 .menu-content button {
     color: black;
     padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-    width: 100%;
     text-align: left;
-    border: none;
     background: none;
-    cursor: pointer;
-    transition: background-color 0.3s;
 }
+
 .menu-content button:hover {
     background-color: #f1f1f1;
 }
+
 .menu-content button.active {
-    background-color: #04AA6D;
+    background-color: var(--primary-color);
     color: white;
 }
-#currentSubject {
-    text-align: center;
-    font-size: 18px;
-    color: #04AA6D;
-    margin-bottom: 20px;
-}
-/* Responsive design for smaller screens */
+
 @media screen and (max-width: 600px) {
     body {
-        padding: 10px;
-        padding-bottom: 120px;
+        padding: 10px 10px 120px;
     }
     .button-overlay {
         flex-direction: column;
