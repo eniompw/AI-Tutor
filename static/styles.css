@@ -13,6 +13,14 @@ h1 {
   color: #04AA6D;
 }
 
+/* Layout */
+.container {
+  padding: 16px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
 /* Form elements */
 textarea {
   width: 100%;
@@ -40,14 +48,6 @@ button {
 
 button:hover {
   background-color: #038f5d;
-}
-
-/* Layout */
-.container {
-  padding: 16px;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 /* Navigation and subject buttons */
@@ -85,23 +85,72 @@ button:hover {
 }
 
 #progressBarFill {
-  transition: width 0.3s ease;
+  transition: width 0.5s linear;
+}
+
+/* Button overlay */
+.button-overlay {
+  position: fixed;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+  transform: translateY(20px);
+  z-index: 1000;
+}
+
+.button-overlay button {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+#tryAgain {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+  transform: translateY(20px);
+}
+
+/* Utility classes */
+.show-buttons {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+
+.loading {
+  animation: pulse 1.5s infinite;
+}
+
+/* Animations */
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
 }
 
 /* Responsive design */
 @media screen and (max-width: 600px) {
   body {
-      padding: 10px;
+    padding: 10px;
   }
   
   .navigation-buttons,
   .subject-buttons {
-      flex-direction: column;
+    flex-direction: column;
   }
   
   .navigation-buttons button,
   .subject-buttons button {
-      width: 100%;
-      margin-bottom: 10px;
+    width: 100%;
+    margin-bottom: 10px;
   }
 }
