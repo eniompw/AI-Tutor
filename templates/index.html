@@ -22,14 +22,19 @@
         </div>
 
         <div class="navigation-buttons">
-            <form action="/previous"><button type="submit">Previous</button></form>
-            <form action="/next"><button type="submit">Next</button></form>
+            <button id="previous">Previous</button>
+            <button id="next">Next</button>
+        </div>
+
+        <div class="subject-buttons">
+            <button id="biology">Biology</button>
+            <button id="computing">Computing</button>
         </div>
     </main>
 
     <section id="feedback">
         <h2>Summary:</h2>
-        <div id="llama"></div>
+        <div id="groq"></div>
         <h2>Detail:</h2>
         <div id="gemini"></div>
     </section>
@@ -38,9 +43,13 @@
         document.addEventListener('DOMContentLoaded', () => {
             const answerInput = document.getElementById('answer');
             const submitButton = document.getElementById('submit');
-            const llamaOutput = document.getElementById('llama');
+            const groqOutput = document.getElementById('groq');
             const geminiOutput = document.getElementById('gemini');
             const progressBarFill = document.getElementById('progressBarFill');
+            const previousButton = document.getElementById('previous');
+            const nextButton = document.getElementById('next');
+            const biologyButton = document.getElementById('biology');
+            const computingButton = document.getElementById('computing');
         
             function updateProgressBar() {
                 let width = 0;
@@ -58,20 +67,38 @@
                 }, 30);
             }
         
+            function markdownToHtmlBold(text) {
+            return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            }
+
             async function fetchFeedback() {
                 const answer = encodeURIComponent(answerInput.value);
         
                 updateProgressBar();
         
                 try {
-                    llamaOutput.textContent = await fetch(`/llama?answer=${answer}`).then(res => res.text());
-                    geminiOutput.innerHTML = await fetch(`/gemini?answer=${answer}`).then(res => res.text());
+                    groqOutput.textContent = await fetch(`/ai_response/groq?answer=${answer}`).then(res => res.text());
+                    geminiOutput.innerHTML = await fetch(`/ai_response/gemini?answer=${answer}`)
+                        .then(res => res.text())
+                        .then(text => markdownToHtmlBold(text));
                 } catch (error) {
                     console.error('Error fetching feedback:', error);
                 }
             }
         
+            function navigate(direction) {
+                fetch(`/${direction}`).then(() => window.location.reload());
+            }
+
+            function changeSubject(subject) {
+                fetch(`/${subject}`).then(() => window.location.reload());
+            }
+        
             submitButton.addEventListener('click', fetchFeedback);
+            previousButton.addEventListener('click', () => navigate('previous'));
+            nextButton.addEventListener('click', () => navigate('next'));
+            biologyButton.addEventListener('click', () => changeSubject('biology'));
+            computingButton.addEventListener('click', () => changeSubject('computing'));
             
             document.addEventListener('keydown', event => {
                 if (event.ctrlKey && event.key === 'Enter') fetchFeedback();

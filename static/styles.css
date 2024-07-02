@@ -1,13 +1,28 @@
-body {font-family: Arial, Helvetica, sans-serif;}
-h1 {text-align: center;}
+/* Base styles */
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
 
+h1 {
+  text-align: center;
+  color: #04AA6D;
+}
+
+/* Form elements */
 textarea {
   width: 100%;
   padding: 12px 20px;
   margin: 8px 0;
-  display: inline-block;
+  display: block;
   border: 1px solid #ccc;
+  border-radius: 4px;
   box-sizing: border-box;
+  font-size: 16px;
 }
 
 button {
@@ -16,9 +31,77 @@ button {
   padding: 14px 20px;
   margin: 8px 0;
   border: none;
+  border-radius: 4px;
   cursor: pointer;
   width: 100%;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
 }
 
-button:hover {opacity: 0.8;}
-.container {padding: 16px;}
+button:hover {
+  background-color: #038f5d;
+}
+
+/* Layout */
+.container {
+  padding: 16px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Navigation and subject buttons */
+.navigation-buttons,
+.subject-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.navigation-buttons button,
+.subject-buttons button {
+  width: 48%;
+}
+
+/* Feedback section */
+#feedback {
+  margin-top: 30px;
+  padding: 20px;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+}
+
+#feedback h2 {
+  color: #04AA6D;
+  border-bottom: 2px solid #04AA6D;
+  padding-bottom: 10px;
+}
+
+/* Progress bar */
+#progressBar {
+  margin-top: 20px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+#progressBarFill {
+  transition: width 0.3s ease;
+}
+
+/* Responsive design */
+@media screen and (max-width: 600px) {
+  body {
+      padding: 10px;
+  }
+  
+  .navigation-buttons,
+  .subject-buttons {
+      flex-direction: column;
+  }
+  
+  .navigation-buttons button,
+  .subject-buttons button {
+      width: 100%;
+      margin-bottom: 10px;
+  }
+}
