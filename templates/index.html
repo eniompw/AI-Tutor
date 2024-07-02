@@ -64,11 +64,11 @@
                         progressBarFill.style.width = `${width}%`;
                         progressBarFill.textContent = `${width}%`;
                     }
-                }, 30);
+                }, 40);
             }
         
             function markdownToHtmlBold(text) {
-            return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
             }
 
             async function fetchFeedback() {
