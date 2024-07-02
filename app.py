@@ -44,22 +44,24 @@ def home():
 
 @app.route('/ai_response/<model>')
 def ai_response(model):
-    query_template = """
-    Question: {question}
-    Student's answer: {answer}
-    Mark scheme: {ms}
-    {additional_instructions}
-    """
-    additional_instructions = {
-        'groq': "Now give the student short and concise feedback on their answer. (Don't narrate your response)",
-        'gemini': "Now mark the student answer and give clear and detailed feedback on it."
+    query_templates = {
+        'groq': """
+        Question: {question}
+        Mark scheme: {ms}
+        Write a short and concise summary (Don't narrate your response).
+        """,
+        'gemini': """
+        Question: {question}
+        Student's answer: {answer}
+        Mark scheme: {ms}
+        I am the student now mark my answer and give clear and detailed feedback on it.
+        """
     }
     
-    query = query_template.format(
+    query = query_templates[model].format(
         question=session['question'],
         answer=request.args.get('answer'),
-        ms=session['ms'],
-        additional_instructions=additional_instructions[model]
+        ms=session['ms'] if model == 'gemini' else ''
     )
     
     return get_ai_response(model, query)
