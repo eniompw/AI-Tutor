@@ -6,6 +6,51 @@
     <title>Exam Tutor</title>
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link rel="stylesheet" href="static/styles.css">
+    <style>
+        .button-overlay {
+            position: fixed;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            transform: translateY(20px);
+            z-index: 1000;
+        }
+        .button-overlay button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        #tryAgain {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            transform: translateY(20px);
+        }
+        #progressBarFill {
+            transition: width 0.5s linear;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+        .loading {
+            animation: pulse 1.5s infinite;
+        }
+        .show-buttons {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+        }
+    </style>
 </head>
 <body>
     <h1>Exam Tutor</h1>
@@ -21,11 +66,6 @@
             <div id="progressBarFill" class="w3-container w3-green w3-center"></div>
         </div>
 
-        <div class="navigation-buttons">
-            <button id="previous">Previous</button>
-            <button id="next">Next</button>
-        </div>
-
         <div class="subject-buttons">
             <button id="biology">Biology</button>
             <button id="computing">Computing</button>
@@ -38,6 +78,12 @@
         <h2 id="detail-heading">Detail:</h2>
         <div id="gemini"></div>
     </section>
+
+    <div class="button-overlay">
+        <button id="previous">Previous</button>
+        <button id="next">Next</button>
+        <button id="tryAgain">Try Again</button>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -52,51 +98,102 @@
             const computingButton = document.getElementById('computing');
             const summaryHeading = document.getElementById('summary-heading');
             const detailHeading = document.getElementById('detail-heading');
+            const buttonOverlay = document.querySelector('.button-overlay');
+            const tryAgainButton = document.getElementById('tryAgain');
 
-            // Set focus on the textarea when the page loads
+            let currentProgress = 0;
+            let targetProgress = 0;
+            let animationInterval;
+
             answerInput.focus();
         
-            function updateProgressBar() {
-                let width = 0;
-                progressBarFill.style.width = '0%';
-                progressBarFill.textContent = '0%';
-        
-                const interval = setInterval(() => {
-                    if (width >= 100) {
-                        clearInterval(interval);
-                    } else {
-                        width++;
-                        progressBarFill.style.width = `${width}%`;
-                        progressBarFill.textContent = `${width}%`;
-                    }
-                }, 40);
+            function easeOutCubic(t) {
+                return 1 - Math.pow(1 - t, 3);
             }
-        
+
+            function updateProgressBar(progress) {
+                progressBarFill.style.width = `${progress}%`;
+                progressBarFill.textContent = `${Math.round(progress)}%`;
+                if (progress > 0 && progress < 100) {
+                    progressBarFill.classList.add('loading');
+                } else {
+                    progressBarFill.classList.remove('loading');
+                }
+            }
+
+            function animateProgress() {
+                if (currentProgress < targetProgress) {
+                    currentProgress += 0.5;
+                    const easedProgress = easeOutCubic(currentProgress / 100) * 100;
+                    updateProgressBar(easedProgress);
+
+                    if (currentProgress >= targetProgress) {
+                        clearInterval(animationInterval);
+                    }
+                }
+            }
+
+            function setProgress(progress) {
+                targetProgress = progress;
+                clearInterval(animationInterval);
+                animationInterval = setInterval(animateProgress, 50);
+            }
+
             function markdownToHtmlBold(text) {
                 return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            }
+
+            function showNavigationButtons() {
+                buttonOverlay.classList.add('show-buttons');
+                tryAgainButton.style.display = 'inline-block';
+                setTimeout(() => {
+                    tryAgainButton.classList.add('show-buttons');
+                }, 50);
+            }
+
+            function scrollToElement(element, delay = 0) {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        element.scrollIntoView({ behavior: 'smooth' });
+                        resolve();
+                    }, delay);
+                });
             }
 
             async function fetchFeedback() {
                 const answer = encodeURIComponent(answerInput.value);
         
-                updateProgressBar();
+                currentProgress = 0;
+                setProgress(0);
+                buttonOverlay.classList.remove('show-buttons');
+                tryAgainButton.classList.remove('show-buttons');
+                tryAgainButton.style.display = 'none';
         
                 try {
-                    // Fetch and display Groq response
-                    groqOutput.textContent = await fetch(`/ai_response/groq?answer=${answer}`).then(res => res.text());
-                    
-                    // Scroll to the summary section after receiving the Groq response
-                    summaryHeading.scrollIntoView({ behavior: 'smooth' });
+                    setProgress(10);
+                    const groqResponse = await fetch(`/ai_response/groq?answer=${answer}`).then(res => res.text());
+                    setProgress(50);
+                    groqOutput.textContent = groqResponse;
+                    await scrollToElement(summaryHeading);
+                    await new Promise(resolve => setTimeout(resolve, 1000));
 
-                    // Fetch and display Gemini response
-                    geminiOutput.innerHTML = await fetch(`/ai_response/gemini?answer=${answer}`)
-                        .then(res => res.text())
-                        .then(text => markdownToHtmlBold(text));
-                    
-                    // Scroll to the detail section after receiving the Gemini response
-                    detailHeading.scrollIntoView({ behavior: 'smooth' });
+                    setProgress(60);
+                    const geminiResponse = await fetch(`/ai_response/gemini?answer=${answer}`).then(res => res.text());
+                    setProgress(70);
+                    geminiOutput.innerHTML = markdownToHtmlBold(geminiResponse);
+                    await scrollToElement(detailHeading);
+
+                    const slowProgress = setInterval(() => {
+                        if (currentProgress < 100) {
+                            setProgress(currentProgress + 1);
+                        } else {
+                            clearInterval(slowProgress);
+                            showNavigationButtons();
+                        }
+                    }, 100);
                 } catch (error) {
                     console.error('Error fetching feedback:', error);
+                    setProgress(0);
                 }
             }
         
@@ -107,12 +204,28 @@
             function changeSubject(subject) {
                 fetch(`/${subject}`).then(() => window.location.reload());
             }
+
+            function tryAgain() {
+                groqOutput.textContent = '';
+                geminiOutput.textContent = '';
+                answerInput.value = '';
+                currentProgress = 0;
+                setProgress(0);
+                buttonOverlay.classList.remove('show-buttons');
+                tryAgainButton.classList.remove('show-buttons');
+                tryAgainButton.style.display = 'none';
+                window.scrollTo({top: 0, behavior: 'smooth'});
+                setTimeout(() => {
+                    answerInput.focus();
+                }, 500);
+            }
         
             submitButton.addEventListener('click', fetchFeedback);
             previousButton.addEventListener('click', () => navigate('previous'));
             nextButton.addEventListener('click', () => navigate('next'));
             biologyButton.addEventListener('click', () => changeSubject('biology'));
             computingButton.addEventListener('click', () => changeSubject('computing'));
+            tryAgainButton.addEventListener('click', tryAgain);
             
             document.addEventListener('keydown', event => {
                 if (event.ctrlKey && event.key === 'Enter') fetchFeedback();
