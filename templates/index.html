@@ -4,14 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exam Tutor</title>
+    <!-- External CSS libraries -->
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link rel="stylesheet" href="static/styles.css">
 </head>
 <body>
     <h1>Exam Tutor</h1>
     <main class="w3-container">
+        <!-- Display the current question -->
         <div id="question">{{ question|safe }}</div>
         
+        <!-- Answer input area -->
         <label for="answer"><b>Answer</b></label>
         <div class="answer-container">
             <textarea id="answer" placeholder="Enter Answer" rows="4" required></textarea>
@@ -20,16 +23,19 @@
         
         <button id="submit">Submit</button>
 
+        <!-- Progress bar -->
         <div id="progressBar" class="w3-light-grey">
             <div id="progressBarFill" class="w3-container w3-green w3-center"></div>
         </div>
 
+        <!-- Subject selection buttons -->
         <div class="subject-buttons">
             <button id="biology">Biology</button>
             <button id="computing">Computing</button>
         </div>
     </main>
 
+    <!-- Feedback section -->
     <section id="feedback">
         <h2 id="summary-heading">Summary:</h2>
         <div id="groq"></div>
@@ -37,6 +43,7 @@
         <div id="gemini"></div>
     </section>
 
+    <!-- Navigation and try again buttons -->
     <div class="button-overlay">
         <button id="previous">Previous</button>
         <button id="next">Next</button>
@@ -44,168 +51,183 @@
     </div>
 
     <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const answerInput = document.getElementById('answer');
-    const submitButton = document.getElementById('submit');
-    const groqOutput = document.getElementById('groq');
-    const geminiOutput = document.getElementById('gemini');
-    const progressBarFill = document.getElementById('progressBarFill');
-    const previousButton = document.getElementById('previous');
-    const nextButton = document.getElementById('next');
-    const biologyButton = document.getElementById('biology');
-    const computingButton = document.getElementById('computing');
-    const summaryHeading = document.getElementById('summary-heading');
-    const detailHeading = document.getElementById('detail-heading');
-    const buttonOverlay = document.querySelector('.button-overlay');
-    const tryAgainButton = document.getElementById('tryAgain');
+    document.addEventListener('DOMContentLoaded', () => {
+        // DOM element references
+        const answerInput = document.getElementById('answer');
+        const submitButton = document.getElementById('submit');
+        const groqOutput = document.getElementById('groq');
+        const geminiOutput = document.getElementById('gemini');
+        const progressBarFill = document.getElementById('progressBarFill');
+        const previousButton = document.getElementById('previous');
+        const nextButton = document.getElementById('next');
+        const biologyButton = document.getElementById('biology');
+        const computingButton = document.getElementById('computing');
+        const summaryHeading = document.getElementById('summary-heading');
+        const detailHeading = document.getElementById('detail-heading');
+        const buttonOverlay = document.querySelector('.button-overlay');
+        const tryAgainButton = document.getElementById('tryAgain');
 
-    let currentProgress = 0;
-    let targetProgress = 0;
-    let animationInterval;
-    let waitingForGemini = false;
+        // Variables for progress bar animation
+        let currentProgress = 0;
+        let targetProgress = 0;
+        let animationInterval;
+        let waitingForGemini = false;
 
-    answerInput.focus();
+        // Set focus to answer input on page load
+        answerInput.focus();
 
-    function easeOutCubic(t) {
-        return 1 - Math.pow(1 - t, 3);
-    }
-
-    function updateProgressBar(progress) {
-        progressBarFill.style.width = `${progress}%`;
-        progressBarFill.textContent = `${Math.round(progress)}%`;
-        if (progress > 0 && progress < 100) {
-            progressBarFill.classList.add('loading');
-        } else {
-            progressBarFill.classList.remove('loading');
+        // Easing function for smooth progress bar animation
+        function easeOutCubic(t) {
+            return 1 - Math.pow(1 - t, 3);
         }
-    }
 
-    function animateProgress() {
-        if (currentProgress < targetProgress) {
-            let increment;
-            
-            if (waitingForGemini && currentProgress >= 90) {
-                // Slow down progressively after 90%
-                increment = 0.1 * (1 - (currentProgress - 90) / 10);
-            } else if (currentProgress >= 40 && currentProgress < 90) {
-                increment = 0.5; // Faster progress between 40% and 90%
+        // Update progress bar width and text
+        function updateProgressBar(progress) {
+            progressBarFill.style.width = `${progress}%`;
+            progressBarFill.textContent = `${Math.round(progress)}%`;
+            if (progress > 0 && progress < 100) {
+                progressBarFill.classList.add('loading');
             } else {
-                increment = 0.3; // Normal increment up to 40%
+                progressBarFill.classList.remove('loading');
             }
-            
-            // Ensure we don't overshoot the target
-            increment = Math.min(increment, targetProgress - currentProgress);
-            
-            currentProgress += increment;
-            
-            // Use easeOutCubic for smoother deceleration
-            const easedProgress = easeOutCubic(currentProgress / 100) * 100;
-            updateProgressBar(easedProgress);
+        }
 
-            if (currentProgress >= targetProgress) {
-                clearInterval(animationInterval);
-                // Ensure we reach exactly 100% at the end
-                if (targetProgress === 100) {
-                    updateProgressBar(100);
+        // Animate progress bar
+        function animateProgress() {
+            if (currentProgress < targetProgress) {
+                let increment;
+                
+                // Adjust increment based on progress and waiting state
+                if (waitingForGemini && currentProgress >= 90) {
+                    increment = 0.1 * (1 - (currentProgress - 90) / 10);
+                } else if (currentProgress >= 40 && currentProgress < 90) {
+                    increment = 0.5;
+                } else {
+                    increment = 0.3;
+                }
+                
+                increment = Math.min(increment, targetProgress - currentProgress);
+                currentProgress += increment;
+                
+                const easedProgress = easeOutCubic(currentProgress / 100) * 100;
+                updateProgressBar(easedProgress);
+
+                if (currentProgress >= targetProgress) {
+                    clearInterval(animationInterval);
+                    if (targetProgress === 100) {
+                        updateProgressBar(100);
+                    }
                 }
             }
         }
-    }
 
-    function setProgress(progress) {
-        targetProgress = progress;
-        clearInterval(animationInterval);
-        animationInterval = setInterval(animateProgress, 50);
-    }
-
-    function markdownToHtmlBold(text) {
-        return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    }
-
-    function showNavigationButtons() {
-        buttonOverlay.classList.add('show-buttons');
-        tryAgainButton.style.display = 'inline-block';
-        setTimeout(() => {
-            tryAgainButton.classList.add('show-buttons');
-        }, 50);
-    }
-
-    function scrollToElement(element, delay = 0) {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                element.scrollIntoView({ behavior: 'smooth' });
-                resolve();
-            }, delay);
-        });
-    }
-
-    async function fetchFeedback() {
-        const answer = encodeURIComponent(answerInput.value);
-
-        currentProgress = 0;
-        waitingForGemini = false;
-        setProgress(0);
-        buttonOverlay.classList.remove('show-buttons');
-        tryAgainButton.classList.remove('show-buttons');
-        tryAgainButton.style.display = 'none';
-
-        try {
-            setProgress(20);
-            const groqResponse = await fetch(`/ai_response/groq?answer=${answer}`).then(res => res.text());
-            setProgress(40);
-            groqOutput.textContent = groqResponse;
-            await scrollToElement(summaryHeading);
-
-            setProgress(80);
-            waitingForGemini = true;
-            setProgress(95); // Set a high target, but it will slow down approaching this
-            const geminiResponse = await fetch(`/ai_response/gemini?answer=${answer}`).then(res => res.text());
-            waitingForGemini = false;
-            setProgress(100);
-            geminiOutput.innerHTML = markdownToHtmlBold(geminiResponse);
-            await scrollToElement(detailHeading);
-        } catch (error) {
-            console.error('Error fetching feedback:', error);
-            setProgress(0);
-        } finally {
-            showNavigationButtons();
+        // Set target progress and start animation
+        function setProgress(progress) {
+            targetProgress = progress;
+            clearInterval(animationInterval);
+            animationInterval = setInterval(animateProgress, 50);
         }
-    }
 
-    function navigate(direction) {
-        fetch(`/${direction}`).then(() => window.location.reload());
-    }
+        // Convert markdown bold syntax to HTML
+        function markdownToHtmlBold(text) {
+            return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        }
 
-    function changeSubject(subject) {
-        fetch(`/${subject}`).then(() => window.location.reload());
-    }
+        // Show navigation buttons
+        function showNavigationButtons() {
+            buttonOverlay.classList.add('show-buttons');
+            tryAgainButton.style.display = 'inline-block';
+            setTimeout(() => {
+                tryAgainButton.classList.add('show-buttons');
+            }, 50);
+        }
 
-    function tryAgain() {
-        groqOutput.textContent = '';
-        geminiOutput.textContent = '';
-        answerInput.value = '';
-        currentProgress = 0;
-        setProgress(0);
-        buttonOverlay.classList.remove('show-buttons');
-        tryAgainButton.classList.remove('show-buttons');
-        tryAgainButton.style.display = 'none';
-        window.scrollTo({top: 0, behavior: 'smooth'});
-        setTimeout(() => {
-            answerInput.focus();
-        }, 500);
-    }
+        // Scroll to element with optional delay
+        function scrollToElement(element, delay = 0) {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                    resolve();
+                }, delay);
+            });
+        }
 
-    submitButton.addEventListener('click', fetchFeedback);
-    previousButton.addEventListener('click', () => navigate('previous'));
-    nextButton.addEventListener('click', () => navigate('next'));
-    biologyButton.addEventListener('click', () => changeSubject('biology'));
-    computingButton.addEventListener('click', () => changeSubject('computing'));
-    tryAgainButton.addEventListener('click', tryAgain);
-    
-    document.addEventListener('keydown', event => {
-        if (event.ctrlKey && event.key === 'Enter') fetchFeedback();
+        // Fetch feedback from AI models
+        async function fetchFeedback() {
+            const answer = encodeURIComponent(answerInput.value);
+
+            // Reset progress and hide buttons
+            currentProgress = 0;
+            waitingForGemini = false;
+            setProgress(0);
+            buttonOverlay.classList.remove('show-buttons');
+            tryAgainButton.classList.remove('show-buttons');
+            tryAgainButton.style.display = 'none';
+
+            try {
+                // Fetch Groq response
+                setProgress(20);
+                const groqResponse = await fetch(`/ai_response/groq?answer=${answer}`).then(res => res.text());
+                setProgress(40);
+                groqOutput.textContent = groqResponse;
+                await scrollToElement(summaryHeading);
+
+                // Fetch Gemini response
+                setProgress(80);
+                waitingForGemini = true;
+                setProgress(95);
+                const geminiResponse = await fetch(`/ai_response/gemini?answer=${answer}`).then(res => res.text());
+                waitingForGemini = false;
+                setProgress(100);
+                geminiOutput.innerHTML = markdownToHtmlBold(geminiResponse);
+                await scrollToElement(detailHeading);
+            } catch (error) {
+                console.error('Error fetching feedback:', error);
+                setProgress(0);
+            } finally {
+                showNavigationButtons();
+            }
+        }
+
+        // Navigate to previous or next question
+        function navigate(direction) {
+            fetch(`/${direction}`).then(() => window.location.reload());
+        }
+
+        // Change subject (biology or computing)
+        function changeSubject(subject) {
+            fetch(`/${subject}`).then(() => window.location.reload());
+        }
+
+        // Reset the page for a new attempt
+        function tryAgain() {
+            groqOutput.textContent = '';
+            geminiOutput.textContent = '';
+            answerInput.value = '';
+            currentProgress = 0;
+            setProgress(0);
+            buttonOverlay.classList.remove('show-buttons');
+            tryAgainButton.classList.remove('show-buttons');
+            tryAgainButton.style.display = 'none';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+            setTimeout(() => {
+                answerInput.focus();
+            }, 500);
+        }
+
+        // Event listeners
+        submitButton.addEventListener('click', fetchFeedback);
+        previousButton.addEventListener('click', () => navigate('previous'));
+        nextButton.addEventListener('click', () => navigate('next'));
+        biologyButton.addEventListener('click', () => changeSubject('biology'));
+        computingButton.addEventListener('click', () => changeSubject('computing'));
+        tryAgainButton.addEventListener('click', tryAgain);
+        
+        // Submit on Ctrl + Enter
+        document.addEventListener('keydown', event => {
+            if (event.ctrlKey && event.key === 'Enter') fetchFeedback();
+        });
     });
-});
     </script>
 </body>
 </html>
