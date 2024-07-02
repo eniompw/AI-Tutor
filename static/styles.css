@@ -1,191 +1,209 @@
-/* Base styles */
-body {
-    font-family: Arial, Helvetica, sans-serif;
-    line-height: 1.6;
-    color: #333;
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    padding-bottom: 100px; /* Added padding to the bottom */
-}
 
-h1 {
-    text-align: center;
-    color: #04AA6D;
-}
-
-/* Layout */
-.container {
-    padding: 16px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-/* Form elements */
-.answer-container {
-    position: relative;
-    margin-bottom: 20px;
-}
-
-textarea {
-    width: 100%;
-    padding: 12px 20px;
-    margin: 8px 0;
-    display: block;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-    font-size: 16px;
-}
-
-/* Tooltip for Ctrl+Enter shortcut */
-.tooltip {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    background-color: rgba(0, 0, 0, 0.05);
-    color: #666;
-    text-align: right;
-    border-radius: 4px;
-    padding: 4px 8px;
-    font-size: 12px;
-    font-style: italic;
-}
-
-/* Button styles */
-button {
-    background-color: #04AA6D;
-    color: white;
-    padding: 14px 20px;
-    margin: 8px 0;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    width: 100%;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-}
-
-button:hover {
-    background-color: #038f5d;
-}
-
-/* Navigation and subject buttons layout */
-.navigation-buttons,
-.subject-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-}
-
-.navigation-buttons button,
-.subject-buttons button {
-    width: 48%;
-}
-
-/* Feedback section styles */
-#feedback {
-    margin-top: 30px;
-    padding: 20px;
-    background-color: #f0f0f0;
-    border-radius: 8px;
-}
-
-#feedback h2 {
-    color: #04AA6D;
-    border-bottom: 2px solid #04AA6D;
-    padding-bottom: 10px;
-}
-
-/* Progress bar styles */
-#progressBar {
-    margin-top: 20px;
-    border-radius: 4px;
-    overflow: hidden;
-}
-
-#progressBarFill {
-    transition: width 0.5s linear;
-}
-
-/* Button overlay for navigation */
-.button-overlay {
-    position: fixed;
-    bottom: 20px;
-    left: 0;
-    right: 0;
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    opacity: 0;
-    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-    transform: translateY(20px);
-    z-index: 1000;
-    background-color: rgba(255, 255, 255, 0.9); /* Added semi-transparent background */
-    padding: 10px; /* Added padding */
-}
-
-.button-overlay button {
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    width: auto; /* Changed from 100% to auto */
-}
-
-/* Try Again button initial state */
-#tryAgain {
-    display: none;
-    opacity: 0;
-    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-    transform: translateY(20px);
-}
-
-/* Utility classes */
-.show-buttons {
-    opacity: 1 !important;
-    transform: translateY(0) !important;
-}
-
-.loading {
-    animation: pulse 1.5s infinite;
-}
-
-/* Animations */
-@keyframes pulse {
-    0% { opacity: 0.6; }
-    50% { opacity: 1; }
-    100% { opacity: 0.6; }
-}
-
-/* Responsive design for smaller screens */
-@media screen and (max-width: 600px) {
-    body {
-        padding: 10px;
-        padding-bottom: 120px; /* Increased padding for smaller screens */
-    }
-    
-    .navigation-buttons,
-    .subject-buttons {
-        flex-direction: column;
-    }
-    
-    .navigation-buttons button,
-    .subject-buttons button {
-        width: 100%;
-        margin-bottom: 10px;
-    }
-
-    .button-overlay {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .button-overlay button {
-        width: 80%; /* Adjusted width for better mobile layout */
-    }
-}
+        /* Base styles */
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-bottom: 100px;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            text-align: center;
+            color: #04AA6D;
+        }
+        /* Layout */
+        .container {
+            padding: 16px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        /* Form elements */
+        .answer-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        textarea {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        /* Tooltip for Ctrl+Enter shortcut */
+        .tooltip {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.05);
+            color: #666;
+            text-align: right;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 12px;
+            font-style: italic;
+        }
+        /* Button styles */
+        button {
+            background-color: #04AA6D;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #038f5d;
+        }
+        /* Feedback section styles */
+        #feedback {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+        }
+        #feedback h2 {
+            color: #04AA6D;
+            border-bottom: 2px solid #04AA6D;
+            padding-bottom: 10px;
+        }
+        /* Progress bar styles */
+        #progressBar {
+            margin-top: 20px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        #progressBarFill {
+            transition: width 0.5s linear;
+        }
+        /* Button overlay for navigation */
+        .button-overlay {
+            position: fixed;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            transform: translateY(20px);
+            z-index: 1000;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+        }
+        .button-overlay button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            width: auto;
+        }
+        /* Try Again button initial state */
+        #tryAgain {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            transform: translateY(20px);
+        }
+        /* Utility classes */
+        .show-buttons {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+        }
+        .loading {
+            animation: pulse 1.5s infinite;
+        }
+        /* Animations */
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+        /* Burger menu styles */
+        .burger-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            cursor: pointer;
+        }
+        .burger-icon {
+            width: 30px;
+            height: 3px;
+            background-color: #333;
+            margin: 6px 0;
+            transition: 0.4s;
+        }
+        .change .bar1 {
+            transform: rotate(-45deg) translate(-5px, 6px);
+        }
+        .change .bar2 {
+            opacity: 0;
+        }
+        .change .bar3 {
+            transform: rotate(45deg) translate(-5px, -6px);
+        }
+        .menu-content {
+            display: none;
+            position: fixed;
+            top: 60px;
+            right: 20px;
+            background-color: white;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 5px;
+        }
+        .menu-content button {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            width: 100%;
+            text-align: left;
+            border: none;
+            background: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .menu-content button:hover {
+            background-color: #f1f1f1;
+        }
+        .menu-content button.active {
+            background-color: #04AA6D;
+            color: white;
+        }
+        #currentSubject {
+            text-align: center;
+            font-size: 18px;
+            color: #04AA6D;
+            margin-bottom: 20px;
+        }
+        /* Responsive design for smaller screens */
+        @media screen and (max-width: 600px) {
+            body {
+                padding: 10px;
+                padding-bottom: 120px;
+            }
+            .button-overlay {
+                flex-direction: column;
+                align-items: center;
+            }
+            .button-overlay button {
+                width: 80%;
+            }
+        }
