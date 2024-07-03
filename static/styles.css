@@ -1,9 +1,13 @@
+/* Global variables */
 :root {
     --primary-color: #04AA6D;
     --bg-color: #f0f0f0;
     --text-color: #333;
+    --shadow: 0 2px 4px rgba(0,0,0,0.1);
+    --border-radius: 4px;
 }
 
+/* Base styles */
 body {
     font-family: Arial, sans-serif;
     line-height: 1.6;
@@ -14,25 +18,27 @@ body {
     background-color: var(--bg-color);
 }
 
+/* Header styles */
 h1, #currentSubject {
     text-align: center;
     color: var(--primary-color);
 }
 
+/* Container styles */
 .container, #feedback {
     background-color: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
     padding: 16px;
     margin-bottom: 20px;
 }
 
+/* Button styles */
 button {
     width: 100%;
     padding: 12px;
     margin: 8px 0;
-    border-radius: 4px;
-    box-sizing: border-box;
+    border-radius: var(--border-radius);
     font-size: 16px;
     background-color: var(--primary-color);
     color: white;
@@ -45,6 +51,7 @@ button:hover {
     background-color: #038f5d;
 }
 
+/* Answer input styles */
 .answer-container {
     position: relative;
     margin-bottom: 20px;
@@ -52,13 +59,11 @@ button:hover {
 
 textarea {
     width: 100%;
-    padding: 12px;
+    padding: 12px 12px 30px;
     margin: 8px 0;
     border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
+    border-radius: var(--border-radius);
     font-size: 16px;
-    padding-bottom: 30px;
 }
 
 .tooltip {
@@ -70,12 +75,13 @@ textarea {
     padding: 4px 8px;
     font-size: 12px;
     font-style: italic;
-    border-radius: 4px;
+    border-radius: var(--border-radius);
 }
 
+/* Progress bar styles */
 #progressBar {
     margin: 15px 0 10px;
-    border-radius: 4px;
+    border-radius: var(--border-radius);
     overflow: hidden;
 }
 
@@ -83,6 +89,7 @@ textarea {
     transition: width 0.5s linear;
 }
 
+/* Feedback section styles */
 #feedback {
     margin-top: 10px;
     padding: 20px;
@@ -93,10 +100,10 @@ textarea {
     color: var(--primary-color);
     border-bottom: 2px solid var(--primary-color);
     padding-bottom: 5px;
-    margin-top: 0;
-    margin-bottom: 10px;
+    margin: 0 0 10px;
 }
 
+/* Navigation button overlay */
 .button-overlay {
     position: fixed;
     bottom: 20px;
@@ -127,6 +134,7 @@ textarea {
     transform: translateY(0) !important;
 }
 
+/* Loading animation */
 .loading {
     animation: pulse 1.5s infinite;
 }
@@ -136,6 +144,7 @@ textarea {
     50% { opacity: 1; }
 }
 
+/* Burger menu styles */
 .burger-menu {
     position: fixed;
     top: 20px;
@@ -156,6 +165,7 @@ textarea {
 .change .bar2 { opacity: 0; }
 .change .bar3 { transform: rotate(45deg) translate(-5px, -6px); }
 
+/* Menu content styles */
 .menu-content {
     display: none;
     position: fixed;
@@ -163,8 +173,8 @@ textarea {
     right: 20px;
     background-color: white;
     min-width: 160px;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-    border-radius: 5px;
+    box-shadow: var(--shadow);
+    border-radius: var(--border-radius);
 }
 
 .menu-content button {
@@ -183,6 +193,7 @@ textarea {
     color: white;
 }
 
+/* Responsive styles */
 @media screen and (max-width: 600px) {
     body {
         padding: 10px 10px 120px;
