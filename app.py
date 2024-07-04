@@ -20,7 +20,7 @@ def get_ai_response(model, query):
         # Use Groq model for response
         chat_completion = groq_client.chat.completions.create(
             messages=[{"role": "user", "content": query}],
-            model="llama3-8b-8192",
+            model="gemma2-9b-it",
         )
         return chat_completion.choices[0].message.content
     elif model == 'gemini':
