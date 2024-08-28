@@ -175,6 +175,7 @@ textarea {
     min-width: 160px;
     box-shadow: var(--shadow);
     border-radius: var(--border-radius);
+    z-index: 1001; /* Add this line */
 }
 
 .menu-content button {

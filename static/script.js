@@ -196,3 +196,13 @@ function changeSubject(subject, reload = true) {
     document.getElementById("subjectMenu").style.display = "none";
     document.querySelector(".burger-menu").classList.remove("change");
 }
+
+// Close menu when clicking outside
+document.addEventListener('click', function(event) {
+    const menu = document.getElementById("subjectMenu");
+    const burgerMenu = document.querySelector('.burger-menu');
+    if (!menu.contains(event.target) && !burgerMenu.contains(event.target)) {
+        menu.style.display = 'none';
+        burgerMenu.classList.remove("change");
+    }
+});

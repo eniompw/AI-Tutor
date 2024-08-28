@@ -12,7 +12,7 @@ app.secret_key = os.urandom(16)  # Set a random secret key for session managemen
 # Configure AI models
 configure(api_key=os.getenv('GOOGLE_API_KEY'))  # Configure Google AI with API key
 gemini_model = GenerativeModel('gemini-1.5-flash')  # Initialize Gemini model
-groq_client = Groq(api_key=os.environ.get("GROQ_API_KEY"))  # Initialize Groq client
+groq_client = Groq(api_key="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")  # Initialize Groq client
 
 # Function to get AI response based on the selected model
 def get_ai_response(model, query):
@@ -87,7 +87,7 @@ def get_subject():
 # Route to set subject
 @app.route('/<subject>')
 def set_subject(subject):
-    if subject in ['biology', 'computing']:
+    if subject in ['biology', 'computing', 'physics']:
         session['subject'] = subject
     return redirect('/')
 
