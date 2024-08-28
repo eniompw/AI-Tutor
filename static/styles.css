@@ -149,7 +149,7 @@ textarea {
     position: fixed;
     top: 20px;
     right: 20px;
-    z-index: 1000;
+    z-index: 1002; /* Add this line */
     cursor: pointer;
 }
 
@@ -171,11 +171,11 @@ textarea {
     position: fixed;
     top: 60px;
     right: 20px;
-    background-color: white;
+    background-color: white; /* Add this line */
     min-width: 160px;
     box-shadow: var(--shadow);
     border-radius: var(--border-radius);
-    z-index: 1001; /* Add this line */
+    z-index: 1002; /* Increase this value */
 }
 
 .menu-content button {
