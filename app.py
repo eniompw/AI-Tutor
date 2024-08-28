@@ -12,7 +12,7 @@ app.secret_key = os.urandom(16)  # Set a random secret key for session managemen
 # Configure AI models
 configure(api_key=os.getenv('GOOGLE_API_KEY'))  # Configure Google AI with API key
 gemini_model = GenerativeModel('gemini-1.5-pro-exp-0827')  # Initialize Gemini model
-groq_client = Groq(api_key="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")  # Initialize Groq client
+groq_client = Groq(api_key=os.environ.get("GROQ_API_KEY"))  # Initialize Groq client
 
 # Function to get AI response based on the selected model
 def get_ai_response(model, query):
