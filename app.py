@@ -46,7 +46,7 @@ def home():
     # Fetch question data
     rows = get_question_data()
     session['total'] = len(rows)
-    session['question'] = rows[session['number']]['question']
+    session['question'] = rows[session['number']]['question'].replace('\n', '<br>')
     session['ms'] = rows[session['number']]['answer']
 
     return render_template('index.html', question=session['question'])
