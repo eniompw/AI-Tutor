@@ -1,5 +1,5 @@
 # Import necessary libraries
-from flask import Flask, render_template, session, request, redirect
+from flask import Flask, render_template, session, request, redirect, url_for, jsonify
 import sqlite3
 import os
 from google.generativeai import configure, GenerativeModel
@@ -29,8 +29,8 @@ def get_ai_response(model, query):
         return response.text.replace("\n", "<br>")  # Replace newlines with HTML line breaks
 
 # Function to fetch question data from the database
-def get_question_data():
-    with sqlite3.connect(f"{session['subject']}.db") as conn:
+def get_question_data(subject):
+    with sqlite3.connect(f"{subject}.db") as conn:
         conn.row_factory = sqlite3.Row
         cur = conn.cursor()
         cur.execute("SELECT question, answer FROM Questions ORDER BY QID")
@@ -39,17 +39,29 @@ def get_question_data():
 # Route for the home page
 @app.route('/')
 def home():
-    # Initialize session variables if not set
-    session.setdefault('number', 0)
-    session.setdefault('subject', 'computing')
+    # Get the current subject from the session, or default to 'computing'
+    current_subject = session.get('subject', 'computing')
     
-    # Fetch question data
-    rows = get_question_data()
+    # Fetch question data for the current subject
+    rows = get_question_data(current_subject)
+    
+    # Update session variables
+    session['subject'] = current_subject
     session['total'] = len(rows)
-    session['question'] = rows[session['number']]['question'].replace('\n', '<br>')
-    session['ms'] = rows[session['number']]['answer']
+    
+    # Ensure number is within bounds or set to 0 if not present
+    session['number'] = min(session.get('number', 0), max(0, len(rows) - 1))
+    
+    # Get the current question
+    if rows:
+        current_question = rows[session['number']]
+        session['question'] = current_question['question'].replace('\n', '<br>')
+        session['ms'] = current_question['answer']
+    else:
+        session['question'] = "No questions available for this subject."
+        session['ms'] = ""
 
-    return render_template('index.html', question=session['question'])
+    return render_template('index.html', question=session['question'], subject=session['subject'])
 
 # Route to get AI response
 @app.route('/ai_response/<model>')
@@ -85,11 +97,18 @@ def get_subject():
     return session['subject']
 
 # Route to set subject
-@app.route('/<subject>')
+@app.route('/<subject>', methods=['GET', 'POST'])
 def set_subject(subject):
     if subject in ['biology', 'computing', 'physics']:
+        session.clear()  # Clear the entire session
         session['subject'] = subject
-    return redirect('/')
+        session['number'] = 0  # Reset question number when changing subject
+        if request.method == 'POST':
+            return jsonify({"success": True, "subject": subject})
+        return redirect(url_for('home'))
+    if request.method == 'POST':
+        return jsonify({"success": False, "subject": session.get('subject', 'computing')})
+    return redirect(url_for('home'))  # Redirect to home even if subject is invalid
 
 # Route to get current question number
 @app.route('/number')
@@ -104,6 +123,48 @@ def navigate(direction):
     elif direction == 'next':
         session['number'] = min(session['total'] - 1, session['number'] + 1)
     return redirect('/')
+
+# Route to get next question
+@app.route('/next')
+def next_question():
+    current_subject = session.get('subject', 'computing')
+    rows = get_question_data(current_subject)
+    session['number'] = min(session.get('number', 0) + 1, len(rows) - 1)
+    
+    if session['number'] < len(rows):
+        current_question = rows[session['number']]
+        session['question'] = current_question['question'].replace('\n', '<br>')
+        session['ms'] = current_question['answer']
+        return jsonify({
+            'success': True,
+            'question': session['question']
+        })
+    else:
+        return jsonify({
+            'success': False,
+            'message': 'No more questions available'
+        })
+
+# Route to get previous question
+@app.route('/previous')
+def previous_question():
+    current_subject = session.get('subject', 'computing')
+    rows = get_question_data(current_subject)
+    session['number'] = max(0, session.get('number', 0) - 1)
+    
+    if session['number'] >= 0:
+        current_question = rows[session['number']]
+        session['question'] = current_question['question'].replace('\n', '<br>')
+        session['ms'] = current_question['answer']
+        return jsonify({
+            'success': True,
+            'question': session['question']
+        })
+    else:
+        return jsonify({
+            'success': False,
+            'message': 'This is the first question'
+        })
 
 # Run the Flask app in debug mode if this script is executed directly
 if __name__ == '__main__':

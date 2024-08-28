@@ -157,7 +157,28 @@ function initializeApp() {
     }
 
     function navigate(direction) {
-        fetch(`/${direction}`).then(() => window.location.reload());
+        fetch(`/${direction}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateQuestion(data.question);
+                    resetUI();
+                } else {
+                    console.error(data.message);
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+    function updateQuestion(question) {
+        document.getElementById('question').innerHTML = question;
+        elements.answerInput.value = '';
+        elements.groqOutput.textContent = '';
+        elements.geminiOutput.textContent = '';
+        setFocus();
     }
 
     function tryAgain() {
@@ -179,6 +200,28 @@ function toggleMenu() {
 }
 
 function changeSubject(subject, reload = true) {
+    if (reload) {
+        fetch(`/${subject}`, { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateSubjectUI(data.subject);
+                    window.location.reload();
+                } else {
+                    console.error('Failed to change subject on server');
+                    updateSubjectUI(data.subject);  // Update UI with the current subject from server
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                updateSubjectUI(subject);  // Fallback to local update on error
+            });
+    } else {
+        updateSubjectUI(subject);
+    }
+}
+
+function updateSubjectUI(subject) {
     const currentSubjectElement = document.getElementById('currentSubject');
     currentSubjectElement.textContent = `Current Subject: ${subject.charAt(0).toUpperCase() + subject.slice(1)}`;
     
@@ -188,10 +231,6 @@ function changeSubject(subject, reload = true) {
     
     localStorage.setItem('currentSubject', subject);
     console.log(`Changed subject to: ${subject}`);
-    
-    if (reload) {
-        fetch(`/${subject}`).then(() => window.location.reload());
-    }
     
     document.getElementById("subjectMenu").style.display = "none";
     document.querySelector(".burger-menu").classList.remove("change");
