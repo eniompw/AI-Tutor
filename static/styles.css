@@ -115,7 +115,6 @@ textarea {
     opacity: 0;
     transition: opacity 0.5s, transform 0.5s;
     transform: translateY(20px);
-    z-index: 1000;
     background-color: rgba(255, 255, 255, 0.9);
     padding: 10px;
 }
@@ -149,7 +148,6 @@ textarea {
     position: fixed;
     top: 20px;
     right: 20px;
-    z-index: 1002; /* Add this line */
     cursor: pointer;
 }
 
@@ -175,7 +173,7 @@ textarea {
     min-width: 160px;
     box-shadow: var(--shadow);
     border-radius: var(--border-radius);
-    z-index: 1002; /* Increase this value */
+    z-index: 1000;
 }
 
 .menu-content button {
