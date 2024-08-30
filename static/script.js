@@ -35,16 +35,8 @@ function initializeApp() {
     }
 
     function loadSavedSubject() {
-        fetch('/subject')
-            .then(response => response.text())
-            .then(subject => {
-                changeSubject(subject, false);
-            })
-            .catch(error => {
-                console.error('Error fetching subject:', error);
-                const savedSubject = localStorage.getItem('currentSubject') || 'computing';
-                changeSubject(savedSubject, false);
-            });
+        const savedSubject = localStorage.getItem('currentSubject') || 'computing';
+        updateSubjectUI(savedSubject);
     }
 
     function setupEventListeners() {
@@ -218,12 +210,14 @@ function changeSubject(subject, reload = true) {
                 }
             } else {
                 console.error('Failed to change subject on server');
-                updateSubjectUI(data.subject);  // Update UI with the current subject from server
+                const currentSubject = localStorage.getItem('currentSubject') || 'computing';
+                updateSubjectUI(currentSubject);
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            updateSubjectUI(subject);  // Fallback to local update on error
+            const currentSubject = localStorage.getItem('currentSubject') || 'computing';
+            updateSubjectUI(currentSubject);
         });
 }
 
