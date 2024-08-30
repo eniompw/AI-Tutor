@@ -4,10 +4,14 @@ import sqlite3
 import os
 from google.generativeai import configure, GenerativeModel
 from groq import Groq
+from datetime import timedelta
 
 # Initialize Flask app
 app = Flask(__name__)
 app.secret_key = os.urandom(16)  # Set a random secret key for session management
+
+# Set session lifetime to 30 minutes
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
 
 # Configure AI models
 configure(api_key=os.getenv('GOOGLE_API_KEY'))  # Configure Google AI with API key
@@ -103,6 +107,7 @@ def set_subject(subject):
         session.clear()  # Clear the entire session
         session['subject'] = subject
         session['number'] = 0  # Reset question number when changing subject
+        session.permanent = True  # Make the session permanent with the 30-minute lifetime
         if request.method == 'POST':
             return jsonify({"success": True, "subject": subject})
         return redirect(url_for('home'))
