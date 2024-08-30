@@ -35,8 +35,16 @@ function initializeApp() {
     }
 
     function loadSavedSubject() {
-        const savedSubject = localStorage.getItem('currentSubject') || 'computing';
-        changeSubject(savedSubject, false);
+        fetch('/subject')
+            .then(response => response.text())
+            .then(subject => {
+                changeSubject(subject, false);
+            })
+            .catch(error => {
+                console.error('Error fetching subject:', error);
+                const savedSubject = localStorage.getItem('currentSubject') || 'computing';
+                changeSubject(savedSubject, false);
+            });
     }
 
     function setupEventListeners() {
@@ -200,25 +208,23 @@ function toggleMenu() {
 }
 
 function changeSubject(subject, reload = true) {
-    if (reload) {
-        fetch(`/${subject}`, { method: 'POST' })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    updateSubjectUI(data.subject);
+    fetch(`/${subject}`, { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateSubjectUI(data.subject);
+                if (reload) {
                     window.location.reload();
-                } else {
-                    console.error('Failed to change subject on server');
-                    updateSubjectUI(data.subject);  // Update UI with the current subject from server
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                updateSubjectUI(subject);  // Fallback to local update on error
-            });
-    } else {
-        updateSubjectUI(subject);
-    }
+            } else {
+                console.error('Failed to change subject on server');
+                updateSubjectUI(data.subject);  // Update UI with the current subject from server
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            updateSubjectUI(subject);  // Fallback to local update on error
+        });
 }
 
 function updateSubjectUI(subject) {

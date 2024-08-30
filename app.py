@@ -4,7 +4,7 @@ import sqlite3
 import os
 from google.generativeai import configure, GenerativeModel
 from groq import Groq
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -17,6 +17,25 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
 configure(api_key=os.getenv('GOOGLE_API_KEY'))  # Configure Google AI with API key
 gemini_model = GenerativeModel('gemini-1.5-pro-exp-0827')  # Initialize Gemini model
 groq_client = Groq(api_key=os.environ.get("GROQ_API_KEY"))  # Initialize Groq client
+
+def clear_expired_sessions():
+    current_time = datetime.utcnow()
+    last_activity = session.get('last_activity')
+    if last_activity:
+        if isinstance(last_activity, str):
+            last_activity = datetime.fromisoformat(last_activity)
+        if (current_time - last_activity).total_seconds() > 1800:  # 30 minutes in seconds
+            session.clear()
+            return True
+    session['last_activity'] = current_time.isoformat()
+    return False
+
+@app.before_request
+def before_request():
+    if clear_expired_sessions():
+        session['subject'] = 'computing'  # Reset to default subject
+    session.permanent = True
+    app.permanent_session_lifetime = timedelta(minutes=30)
 
 # Function to get AI response based on the selected model
 def get_ai_response(model, query):
@@ -43,14 +62,17 @@ def get_question_data(subject):
 # Route for the home page
 @app.route('/')
 def home():
-    # Get the current subject from the session, or default to 'computing'
-    current_subject = session.get('subject', 'computing')
+    # Check if the session has expired
+    if 'subject' not in session:
+        session['subject'] = 'computing'
+    
+    # Get the current subject from the session
+    current_subject = session['subject']
     
     # Fetch question data for the current subject
     rows = get_question_data(current_subject)
     
     # Update session variables
-    session['subject'] = current_subject
     session['total'] = len(rows)
     
     # Ensure number is within bounds or set to 0 if not present
@@ -107,7 +129,7 @@ def set_subject(subject):
         session.clear()  # Clear the entire session
         session['subject'] = subject
         session['number'] = 0  # Reset question number when changing subject
-        session.permanent = True  # Make the session permanent with the 30-minute lifetime
+        session['last_activity'] = datetime.utcnow().isoformat()
         if request.method == 'POST':
             return jsonify({"success": True, "subject": subject})
         return redirect(url_for('home'))
