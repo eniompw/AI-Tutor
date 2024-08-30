@@ -53,7 +53,8 @@ def get_ai_response(model, query):
 
 # Function to fetch question data from the database
 def get_question_data(subject):
-    with sqlite3.connect(f"{subject}.db") as conn:
+    db_path = os.path.join('data', f"{subject}.db")
+    with sqlite3.connect(db_path) as conn:
         conn.row_factory = sqlite3.Row
         cur = conn.cursor()
         cur.execute("SELECT question, answer FROM Questions ORDER BY QID")
