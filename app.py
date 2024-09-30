@@ -126,7 +126,7 @@ def get_subject():
 # Route to set subject
 @app.route('/<subject>', methods=['GET', 'POST'])
 def set_subject(subject):
-    if subject in ['biology', 'computing', 'physics', 'spanish']:
+    if subject in ['biology', 'computing', 'physics']:
         session.clear()  # Clear the entire session
         session['subject'] = subject
         session['number'] = 0  # Reset question number when changing subject
