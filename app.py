@@ -15,7 +15,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
 
 # Configure AI models
 configure(api_key=os.getenv('GOOGLE_API_KEY'))  # Configure Google AI with API key
-gemini_model = GenerativeModel('gemini-1.5-pro-002')  # Initialize Gemini model
+gemini_model = GenerativeModel('gemini-1.5-pro-exp-0827')  # Initialize Gemini model
 groq_client = Groq(api_key=os.environ.get("GROQ_API_KEY"))  # Initialize Groq client
 
 def clear_expired_sessions():
